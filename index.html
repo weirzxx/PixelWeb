@@ -12,7 +12,6 @@
             --bg: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
             --glass: rgba(255, 255, 255, 0.12);
             --text: #ffffff;
-            /* Плавная пружинная анимация как на видео */
             --spring: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -64,7 +63,6 @@
             transition: transform 0.6s var(--spring), opacity 0.6s ease, filter 0.6s ease;
         }
 
-        /* Эффект отдаления рабочего стола */
         .home-dimmed {
             transform: scale(0.9);
             opacity: 0.5;
@@ -112,7 +110,6 @@
         .dock { display: flex; justify-content: space-between; padding: 0 5px 10px; }
         .dock-icon { width: 50px; height: 50px; border-radius: 50%; }
 
-        /* Навигационная зона */
         .nav-zone {
             width: 100%; height: 40px;
             position: absolute; bottom: 0; left: 0;
@@ -127,13 +124,11 @@
             transition: background 0.3s, width 0.3s;
         }
 
-        /* Продвинутая анимация окна как на видео */
         .modal {
             position: absolute; inset: 0;
             background: #f8f9fa; color: #202124;
             z-index: 2000; border-radius: 48px;
             display: none; opacity: 0;
-            /* Начальное состояние: уменьшено и внизу */
             transform: scale(0.85) translateY(100%);
             transition: transform 0.6s var(--spring), opacity 0.4s ease, border-radius 0.6s var(--spring);
             overflow: hidden;
@@ -171,7 +166,6 @@
         .log-version h3 { margin: 0 0 5px 0; color: #1a73e8; font-size: 18px; }
         .log-version ul { margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.6; }
 
-        /* Browser App */
         #browser-page {
             position: absolute; inset: 0;
             background: #fff; z-index: 2050;
@@ -205,11 +199,11 @@
         </div>
 
         <div class="app-grid">
-            <div class="app" id="icon-settings" onclick="openApp('settings-page')">
+            <div class="app" onclick="openApp('settings-page')">
                 <div class="icon">⚙️</div>
                 <span>Settings</span>
             </div>
-            <div class="app" id="icon-browser" onclick="openApp('browser-page')">
+            <div class="app" onclick="openApp('browser-page')">
                 <div class="icon">🌐</div>
                 <span>Browser</span>
             </div>
@@ -253,7 +247,7 @@
                 <div class="log-version">
                     <h3>0.7 Beta (Current)</h3>
                     <ul>
-                        <li>Hyper-smooth system animations [Video Match]</li>
+                        <li>Hyper-smooth system animations</li>
                         <li>Added Browser application</li>
                         <li>Fixed gesture triggers on home screen</li>
                     </ul>
@@ -289,7 +283,6 @@
         activeAppId = id;
         const app = document.getElementById(id);
         app.style.display = 'flex';
-        // Динамический эффект: появление из центра
         setTimeout(() => {
             home.classList.add('home-dimmed');
             app.classList.add('active');
@@ -302,11 +295,10 @@
         closeChangelog();
         home.classList.remove('home-dimmed');
         app.classList.remove('active');
-        // Эффект закрытия: окно уменьшается и уходит вниз
         app.style.transform = 'scale(0.85) translateY(100%)';
         setTimeout(() => { 
             app.style.display = 'none';
-            app.style.transform = ''; // Сброс для следующего открытия
+            app.style.transform = '';
             activeAppId = null; 
         }, 600);
     }
@@ -314,7 +306,6 @@
     function openChangelog() { changelog.classList.add('open'); }
     function closeChangelog() { changelog.classList.remove('open'); }
 
-    // Logic for smooth gestures (matching video physics)
     let startY = 0;
     let isActive = false;
 
@@ -332,13 +323,11 @@
         
         if (diff > 0) {
             app.style.transition = 'none';
-            // Нелинейное сжатие как в HyperOS/iOS
             let scale = 1 - (diff / 2000);
             let move = -diff / 1.1;
             app.style.transform = `scale(${scale}) translateY(${move}px)`;
             app.style.borderRadius = `${48 + diff/10}px`;
             
-            // Рабочий стол плавно возвращается
             home.style.transition = 'none';
             home.style.transform = `scale(${0.9 + (diff/2000)})`;
             home.style.opacity = `${0.5 + (diff/1000)}`;
