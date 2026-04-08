@@ -25,12 +25,11 @@
             align-items: center;
         }
 
-        /* --- КОРПУС ТЕЛЕФОНА (СДЕЛАН МЕНЬШЕ И ИЗЯЩНЕЕ) --- */
         .phone-frame {
-            width: 88vw; /* Было 95vw */
-            height: 88vh; /* Было 95vh */
-            max-width: 380px; /* Было 420px */
-            max-height: 800px; /* Было 850px */
+            width: 88vw;
+            height: 88vh;
+            max-width: 380px;
+            max-height: 800px;
             background: var(--bg);
             border: 10px solid #222;
             border-radius: 48px;
@@ -39,21 +38,19 @@
             display: flex;
             flex-direction: column;
             box-shadow: 0 30px 60px rgba(0,0,0,0.7);
-            transition: all 0.3s ease;
         }
 
-        /* --- ТОЧКА-КАМЕРА ВМЕСТО ЧЁЛКИ --- */
         .notch {
             position: absolute;
-            top: 15px; /* Чуть ниже от края */
+            top: 15px;
             left: 50%;
             transform: translateX(-50%);
-            width: 14px; /* Маленькая точка */
+            width: 14px;
             height: 14px;
-            background: #111; /* Тёмный объектив */
-            border-radius: 50%; /* Круглая */
+            background: #111;
+            border-radius: 50%;
             z-index: 100;
-            border: 2px solid #222; /* Ободок */
+            border: 2px solid #222;
         }
 
         .screen {
@@ -61,7 +58,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 45px 18px 25px; /* Чуть больше отступ сверху из-за камеры */
+            padding: 45px 18px 25px;
         }
 
         .at-a-glance h1 { margin: 0; font-size: 32px; font-weight: 300; }
@@ -97,3 +94,129 @@
         }
 
         .bottom-nav { width: 100%; }
+
+        .search-bar {
+            background: rgba(255,255,255,0.95);
+            height: 46px;
+            border-radius: 23px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            color: #555;
+            margin-bottom: 22px;
+            font-size: 14px;
+        }
+
+        .dock {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 5px 5px;
+        }
+
+        .dock-icon { 
+            width: 50px; height: 50px; 
+            border-radius: 50%; 
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+
+        .modal {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: #f8f9fa;
+            color: #202124;
+            z-index: 1000;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal.active {
+            display: block;
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 18px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            background: #fff;
+            border-bottom: 1px solid #eee;
+        }
+
+        .back-btn { font-size: 26px; margin-right: 18px; cursor: pointer; color: #1a73e8; }
+        .item { padding: 16px 18px; border-bottom: 1px solid #f0f0f0; background: #fff; }
+        .item p { margin: 0; font-weight: 500; font-size: 15px; }
+        .item small { color: #70757a; font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="phone-frame">
+    <div class="notch"></div>
+    
+    <div class="screen">
+        <div class="at-a-glance">
+            <h1 id="clock">00:00</h1>
+            <p id="date">Loading...</p>
+        </div>
+
+        <div class="app-grid">
+            <div class="app" onclick="openSettings()">
+                <div class="icon">⚙️</div>
+                <span>Settings</span>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <div class="search-bar">Search your phone...</div>
+            <div class="dock">
+                <div class="dock-icon" style="background:#34a853"></div>
+                <div class="dock-icon" style="background:#4285f4"></div>
+                <div class="dock-icon" style="background:#fbbc05"></div>
+                <div class="dock-icon" style="background:#ea4335"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings" class="modal">
+        <div class="modal-header">
+            <span class="back-btn" onclick="closeSettings()">←</span>
+            <span>Settings</span>
+        </div>
+        <div class="item" onclick="alert('PixelWeb 0.4 Beta\nDev: weirzxx\nTikTok: @weirzxx1\nBuild: 2026.04.08')">
+            <p>About Phone</p>
+            <small>PixelWeb 0.4 Beta | @weirzxx1</small>
+        </div>
+        <div class="item"><p>System</p><small>Android Web UI</small></div>
+        <div class="item"><p>Display</p><small>Compact Frame with Dot-notch</small></div>
+    </div>
+</div>
+
+<script>
+    function updateTime() {
+        const now = new Date();
+        document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('date').innerText = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+    }
+
+    function openSettings() {
+        const m = document.getElementById('settings');
+        m.style.display = 'block';
+        setTimeout(() => m.classList.add('active'), 10);
+    }
+
+    function closeSettings() {
+        const m = document.getElementById('settings');
+        m.classList.remove('active');
+        setTimeout(() => m.style.display = 'none', 350);
+    }
+
+    setInterval(updateTime, 1000);
+    updateTime();
+</script>
+
+</body>
+</html>
