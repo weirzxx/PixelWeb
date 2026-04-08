@@ -5,44 +5,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>PixelWeb OS</title>
     <style>
         :root {
             --bg: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
             --glass: rgba(255, 255, 255, 0.15);
             --text: #ffffff;
+            --phone-width: 360px; /* Фиксированная ширина вирт. телефона */
+            --phone-height: 740px; /* Фиксированная высота вирт. телефона */
         }
 
         body, html {
             margin: 0; padding: 0; height: 100%;
             font-family: 'Segoe UI', Roboto, sans-serif;
-            background: var(--bg);
+            background: #111; /* Фон браузера за телефоном */
             color: var(--text);
             overflow: hidden;
             user-select: none;
+            display: flex;
+            justify-content: center; /* Центрируем телефон */
+            align-items: center;
         }
 
-        .screen {
-            height: 100vh;
+        /* КОРПУС ТЕЛЕФОНА (Рамка) */
+        .phone-frame {
+            width: var(--phone-width);
+            height: var(--phone-height);
+            background: #fff; /* Цвет корпуса */
+            border-radius: 40px; /* Закругленные углы телефона */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* Тень от телефона */
+            overflow: hidden; /* Всё, что внутри, не выходит за рамки */
+            position: relative;
+            border: 12px solid #222; /* Сама рамка корпуса */
+        }
+
+        /* ВНУТРЕННИЙ ЭКРАН ТЕЛЕФОНА */
+        .screen-content {
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 50px 20px 20px;
+            padding: 30px 15px 10px; /* Отступы от рамки */
             box-sizing: border-box;
+            position: relative;
+        }
+
+        /* Notch (Челка/Вырез) */
+        .notch {
+            position: absolute;
+            top: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 150px; height: 18px;
+            background: #222;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            z-index: 50;
         }
 
         /* At a Glance */
-        .at-a-glance { padding-left: 10px; }
-        .at-a-glance h1 { margin: 0; font-size: 28px; font-weight: 400; }
-        .at-a-glance p { margin: 5px 0; opacity: 0.8; }
+        .at-a-glance { padding-left: 10px; padding-top: 10px; }
+        .at-a-glance h1 { margin: 0; font-size: 30px; font-weight: 400; }
+        .at-a-glance p { margin: 3px 0; opacity: 0.9; font-size: 16px; }
 
         /* Apps */
         .app-grid {
             flex-grow: 1;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            padding-top: 40px;
+            gap: 15px;
+            padding-top: 30px;
         }
 
         .app {
@@ -50,127 +84,95 @@
             flex-direction: column;
             align-items: center;
             cursor: pointer;
+            transition: transform 0.1s;
         }
+        .app:active { transform: scale(0.95); } /* Эффект нажатия */
 
         .icon {
-            width: 60px; height: 60px;
+            width: 55px; height: 55px;
             background: var(--glass);
-            border-radius: 16px;
-            backdrop-filter: blur(10px);
+            border-radius: 18px;
+            backdrop-filter: blur(15px);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 30px;
-            margin-bottom: 8px;
-            border: 1px solid rgba(255,255,255,0.1);
+            font-size: 28px;
+            margin-bottom: 5px;
+            border: 1px solid rgba(255,255,255,0.2);
         }
 
-        /* Bottom Search & Dock */
+        /* Bottom Search & Dock (Теперь они ВНУТРИ экрана) */
+        .bottom-area {
+            width: 100%;
+            padding: 0 5px;
+            box-sizing: border-box;
+        }
+
         .search {
-            background: rgba(255,255,255,0.9);
-            height: 50px;
-            border-radius: 25px;
+            background: rgba(255,255,255,0.95);
+            height: 48px;
+            border-radius: 24px;
             display: flex;
             align-items: center;
-            padding: 0 20px;
+            padding: 0 15px;
             color: #555;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .dock {
             display: flex;
             justify-content: space-around;
-            padding-bottom: 10px;
+            padding-bottom: 15px;
+            padding-top: 5px;
+            border-top: 1px solid rgba(255,255,255,0.1);
         }
 
         .dock-icon {
-            width: 55px; height: 55px;
+            width: 50px; height: 50px;
             border-radius: 50%;
-            background: var(--glass);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
-        /* Settings Modal */
+        /* --- НОВАЯ АНИМАЦИЯ НАСТРОЕК (как в OriginWeb) --- */
         .modal {
             display: none;
-            position: fixed;
+            position: absolute; /* Теперь модалка внутри .screen-content */
             inset: 0;
-            background: #ffffff;
-            color: #000;
+            background: #f8f9fa;
+            color: #202124;
             z-index: 1000;
-            animation: slide 0.3s ease-out;
+            opacity: 0;
+            transform: scale(0.8); /* Начинаем чуть сжато */
+            pointer-events: none; /* Пока скрыто, не кликается */
+            transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                        transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 28px; /* Чуть закруглим модалку внутри */
+            overflow: hidden;
         }
 
-        @keyframes slide { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        /* Активное состояние модалки */
+        .modal.open {
+            display: block;
+            opacity: 1;
+            transform: scale(1); /* Плавное открытие во весь экран */
+            pointer-events: auto;
+        }
 
         .modal-header {
-            padding: 20px;
-            font-size: 22px;
-            border-bottom: 1px solid #eee;
+            padding: 15px 20px;
+            font-size: 20px;
+            background: #fff;
             display: flex;
             align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
-        .back-btn { font-size: 30px; margin-right: 20px; cursor: pointer; }
+        .back-btn { font-size: 26px; margin-right: 15px; cursor: pointer; color: #1a73e8; }
 
-        .item { padding: 15px 20px; border-bottom: 1px solid #f5f5f5; }
-        .item p { margin: 0; font-weight: 500; }
-        .item small { color: #888; }
-    </style>
-</head>
-<body>
-
-    <div class="screen">
-        <div class="at-a-glance">
-            <h1 id="clock">00:00</h1>
-            <p id="date">Loading...</p>
-        </div>
-
-        <div class="app-grid">
-            <div class="app" onclick="toggleSettings(true)">
-                <div class="icon">⚙️</div>
-                <span>Settings</span>
-            </div>
-        </div>
-
-        <div class="bottom">
-            <div class="search">Google Search...</div>
-            <div class="dock">
-                <div class="dock-icon" style="background:#4caf50"></div>
-                <div class="dock-icon" style="background:#2196f3"></div>
-                <div class="dock-icon" style="background:#ffc107"></div>
-                <div class="dock-icon" style="background:#f44336"></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="settings" class="modal">
-        <div class="modal-header">
-            <span class="back-btn" onclick="toggleSettings(false)">←</span>
-            <span>Settings</span>
-        </div>
-        <div class="item" onclick="alert('PixelWeb Beta 0.2\nBuild: 2026.04.08\nDev: weirzxx')">
-            <p>About Phone</p>
-            <small>PixelWeb 0.2 Beta</small>
-        </div>
-        <div class="item"><p>System</p><small>None</small></div>
-        <div class="item"><p>Display</p><small>None</small></div>
-        <div class="item"><p>Storage</p><small>None</small></div>
-    </div>
-
-    <script>
-        function updateTime() {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-            document.getElementById('date').innerText = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+        .item { 
+            padding: 15px 20px; 
+            border-bottom: 1px solid #eee; 
+            background: #fff;
         }
-
-        function toggleSettings(show) {
-            document.getElementById('settings').style.display = show ? 'block' : 'none';
-        }
-
-        setInterval(updateTime, 1000);
-        updateTime();
-    </script>
-</body>
-  </html>
-  
+        .item p { margin: 0; font-size: 15px; font
