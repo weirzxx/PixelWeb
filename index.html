@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>PixelWeb OS 0.8 Beta</title>
+    <title>PixelWeb OS 0.8.1 Beta</title>
     <style>
         :root {
             --bg: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
@@ -100,7 +100,6 @@
         }
         .nav-handle { width: 120px; height: 4px; background: rgba(255,255,255,0.6); border-radius: 2px; }
 
-        .bottom-nav { width: 100%; }
         .search-bar {
             background: rgba(255,255,255,0.95); height: 46px; border-radius: 23px;
             display: flex; align-items: center; padding: 0 16px; color: #555;
@@ -137,12 +136,12 @@
         </div>
         <div class="modal-content">
             <div class="item">
-                <p>Version 0.8 Beta</p>
-                <small>Dynamic Icon Zoom</small>
+                <p>Version 0.8.1 Beta</p>
+                <small>Fixed Zoom Logic & Cleaned Layout</small>
             </div>
             <div class="item">
-                <p>System</p>
-                <small>Animations Optimized</small>
+                <p>Developer</p>
+                <small>weirzxx</small>
             </div>
         </div>
     </div>
@@ -154,6 +153,7 @@
 
 <script>
     const home = document.getElementById('home-screen');
+    const frame = document.querySelector('.phone-frame');
     let activeAppId = null;
     let originIconId = null;
 
@@ -169,22 +169,22 @@
         const app = document.getElementById(appId);
         const icon = document.getElementById(iconId);
         const rect = icon.getBoundingClientRect();
-        const frameRect = document.querySelector('.phone-frame').getBoundingClientRect();
+        const frameRect = frame.getBoundingClientRect();
         
         const centerX = rect.left + rect.width / 2 - frameRect.left;
         const centerY = rect.top + rect.height / 2 - frameRect.top;
 
         app.style.display = 'flex';
         app.style.transition = 'none';
-        app.style.transform = `translate(${centerX - frameRect.width/2}px, ${centerY - frameRect.height/2}px) scale(0.1)`;
-        app.style.borderRadius = '100px';
+        app.style.transform = `translate(${centerX - (frameRect.width / 2)}px, ${centerY - (frameRect.height / 2)}px) scale(0.1)`;
         app.style.opacity = '0';
+        app.style.borderRadius = '30px';
 
         setTimeout(() => {
             app.style.transition = 'transform 0.6s var(--spring), opacity 0.4s ease, border-radius 0.6s var(--spring)';
             app.classList.add('active');
             home.classList.add('home-dimmed');
-        }, 20);
+        }, 30);
     }
 
     function closeAppWithZoom() {
@@ -192,15 +192,15 @@
         const app = document.getElementById(activeAppId);
         const icon = document.getElementById(originIconId);
         const rect = icon.getBoundingClientRect();
-        const frameRect = document.querySelector('.phone-frame').getBoundingClientRect();
+        const frameRect = frame.getBoundingClientRect();
         
         const centerX = rect.left + rect.width / 2 - frameRect.left;
         const centerY = rect.top + rect.height / 2 - frameRect.top;
 
         app.classList.remove('active');
-        app.style.transform = `translate(${centerX - frameRect.width/2}px, ${centerY - frameRect.height/2}px) scale(0.1)`;
-        app.style.borderRadius = '100px';
+        app.style.transform = `translate(${centerX - (frameRect.width / 2)}px, ${centerY - (frameRect.height / 2)}px) scale(0.1)`;
         app.style.opacity = '0';
+        app.style.borderRadius = '30px';
         home.classList.remove('home-dimmed');
 
         setTimeout(() => {
@@ -215,7 +215,7 @@
     });
 
     document.getElementById('nav-zone').addEventListener('touchend', e => {
-        if (activeAppId && (startY - e.changedTouches[0].clientY > 50)) {
+        if (activeAppId && (startY - e.changedTouches[0].clientY > 40)) {
             closeAppWithZoom();
         }
     });
