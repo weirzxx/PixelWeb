@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>PixelWeb OS 0.8.1 Beta</title>
+    <title>PixelWeb OS 0.8.2 Beta</title>
     <style>
         :root {
             --bg: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
@@ -44,22 +44,35 @@
         #home-screen {
             width: 100%; height: 100%;
             display: flex; flex-direction: column;
-            justify-content: space-between;
-            padding: 45px 18px 20px; box-sizing: border-box;
+            justify-content: flex-start;
+            padding: 50px 20px 20px; box-sizing: border-box;
             transition: transform 0.6s var(--spring), opacity 0.6s ease, filter 0.6s ease;
         }
 
         .home-dimmed { transform: scale(0.95); opacity: 0.5; filter: blur(15px); }
 
-        .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+        .widget-clock {
+            padding: 20px 10px 40px;
+            text-align: left;
+            width: 100%;
+        }
+        .widget-clock h1 { font-size: 48px; font-weight: 300; margin: 0; letter-spacing: -1px; }
+        .widget-clock p { font-size: 18px; margin: 5px 0 0; opacity: 0.8; }
+
+        .app-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 20px; 
+            width: 100%;
+        }
 
         .app { display: flex; flex-direction: column; align-items: center; font-size: 11px; cursor: pointer; }
         .icon {
-            width: 58px; height: 58px;
-            background: var(--glass); border-radius: 17px;
+            width: 60px; height: 60px;
+            background: var(--glass); border-radius: 18px;
             backdrop-filter: blur(10px); display: flex;
-            align-items: center; justify-content: center; font-size: 28px;
-            margin-bottom: 5px; border: 1px solid rgba(255,255,255,0.1);
+            align-items: center; justify-content: center; font-size: 30px;
+            margin-bottom: 6px; border: 1px solid rgba(255,255,255,0.1);
             transition: transform 0.2s;
         }
         .app:active .icon { transform: scale(0.9); }
@@ -69,14 +82,13 @@
             background: #f8f9fa; color: #202124;
             z-index: 2000; border-radius: 48px;
             display: none; opacity: 0;
-            transform-origin: center;
             transition: transform 0.6s var(--spring), opacity 0.4s ease, border-radius 0.6s var(--spring);
             overflow: hidden; flex-direction: column;
         }
 
         .modal.active {
             display: flex; opacity: 1;
-            transform: scale(1) translate(0, 0) !important;
+            transform: translate(0, 0) scale(1) !important;
             border-radius: 48px;
         }
 
@@ -100,10 +112,15 @@
         }
         .nav-handle { width: 120px; height: 4px; background: rgba(255,255,255,0.6); border-radius: 2px; }
 
+        .bottom-area {
+            margin-top: auto;
+            width: 100%;
+            padding-bottom: 20px;
+        }
         .search-bar {
-            background: rgba(255,255,255,0.95); height: 46px; border-radius: 23px;
-            display: flex; align-items: center; padding: 0 16px; color: #555;
-            margin-bottom: 22px; font-size: 14px;
+            background: rgba(255,255,255,0.95); height: 48px; border-radius: 24px;
+            display: flex; align-items: center; padding: 0 18px; color: #555;
+            font-size: 15px;
         }
     </style>
 </head>
@@ -113,8 +130,9 @@
     <div class="notch"></div>
     
     <div id="home-screen">
-        <div style="padding: 10px;">
-            <h1 id="clock" style="font-size: 32px; font-weight: 300; margin:0;">00:00</h1>
+        <div class="widget-clock">
+            <h1 id="clock">00:00</h1>
+            <p id="date">Loading...</p>
         </div>
 
         <div class="app-grid">
@@ -124,7 +142,7 @@
             </div>
         </div>
 
-        <div class="bottom-nav">
+        <div class="bottom-area">
             <div class="search-bar">Search...</div>
         </div>
     </div>
@@ -136,12 +154,12 @@
         </div>
         <div class="modal-content">
             <div class="item">
-                <p>Version 0.8.1 Beta</p>
-                <small>Fixed Zoom Logic & Cleaned Layout</small>
+                <p>Version 0.8.2 Beta</p>
+                <small>Fixed Layout & Global Rect Logic</small>
             </div>
             <div class="item">
-                <p>Developer</p>
-                <small>weirzxx</small>
+                <p>Status</p>
+                <small>Running smooth</small>
             </div>
         </div>
     </div>
@@ -160,6 +178,7 @@
     function updateTime() {
         const now = new Date();
         document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('date').innerText = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
     }
     setInterval(updateTime, 1000); updateTime();
 
@@ -168,23 +187,24 @@
         originIconId = iconId;
         const app = document.getElementById(appId);
         const icon = document.getElementById(iconId);
+        
         const rect = icon.getBoundingClientRect();
         const frameRect = frame.getBoundingClientRect();
         
-        const centerX = rect.left + rect.width / 2 - frameRect.left;
-        const centerY = rect.top + rect.height / 2 - frameRect.top;
+        const x = rect.left - frameRect.left + (rect.width / 2);
+        const y = rect.top - frameRect.top + (rect.height / 2);
 
         app.style.display = 'flex';
         app.style.transition = 'none';
-        app.style.transform = `translate(${centerX - (frameRect.width / 2)}px, ${centerY - (frameRect.height / 2)}px) scale(0.1)`;
+        app.style.transform = `translate(${x - (frameRect.width / 2)}px, ${y - (frameRect.height / 2)}px) scale(0.12)`;
         app.style.opacity = '0';
-        app.style.borderRadius = '30px';
+        app.style.borderRadius = '25px';
 
         setTimeout(() => {
-            app.style.transition = 'transform 0.6s var(--spring), opacity 0.4s ease, border-radius 0.6s var(--spring)';
+            app.style.transition = 'transform 0.6s var(--spring), opacity 0.3s ease, border-radius 0.6s var(--spring)';
             app.classList.add('active');
             home.classList.add('home-dimmed');
-        }, 30);
+        }, 25);
     }
 
     function closeAppWithZoom() {
@@ -194,13 +214,13 @@
         const rect = icon.getBoundingClientRect();
         const frameRect = frame.getBoundingClientRect();
         
-        const centerX = rect.left + rect.width / 2 - frameRect.left;
-        const centerY = rect.top + rect.height / 2 - frameRect.top;
+        const x = rect.left - frameRect.left + (rect.width / 2);
+        const y = rect.top - frameRect.top + (rect.height / 2);
 
         app.classList.remove('active');
-        app.style.transform = `translate(${centerX - (frameRect.width / 2)}px, ${centerY - (frameRect.height / 2)}px) scale(0.1)`;
+        app.style.transform = `translate(${x - (frameRect.width / 2)}px, ${y - (frameRect.height / 2)}px) scale(0.12)`;
         app.style.opacity = '0';
-        app.style.borderRadius = '30px';
+        app.style.borderRadius = '25px';
         home.classList.remove('home-dimmed');
 
         setTimeout(() => {
