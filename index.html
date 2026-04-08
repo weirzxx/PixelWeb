@@ -6,12 +6,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>PixelWeb OS 0.8.5 Beta</title>
+    <title>PixelWeb OS 0.8.6 Final Fix</title>
     <style>
         :root {
             --bg: #000000;
             --accent-bg: #1a1a1a;
-            --glass: rgba(255, 255, 255, 0.1);
             --text: #ffffff;
             --subtext: #999999;
             --spring: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -52,25 +51,34 @@
 
         .home-dimmed { transform: scale(0.92); opacity: 0.4; filter: blur(10px); }
 
-        .widget-clock { margin-bottom: 40px; }
+        .widget-clock { margin-bottom: 40px; pointer-events: none; }
         .widget-clock h1 { font-size: 56px; font-weight: 200; margin: 0; letter-spacing: -2px; }
-        .widget-clock p { font-size: 18px; margin: 4px 0 0; color: var(--subtext); font-weight: 400; }
+        .widget-clock p { font-size: 18px; margin: 4px 0 0; color: var(--subtext); }
 
-        .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .app-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 20px; 
+            position: relative;
+            z-index: 100;
+        }
 
         .app { 
-            display: flex; flex-direction: column; align-items: center; 
-            font-size: 12px; cursor: pointer; position: relative; z-index: 10;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            font-size: 12px; 
+            cursor: pointer;
         }
+
         .icon {
             width: 62px; height: 62px;
             background: var(--accent-bg); border-radius: 16px;
             display: flex; align-items: center; justify-content: center; 
             font-size: 32px; margin-bottom: 8px;
             border: 1px solid rgba(255,255,255,0.05);
-            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
         }
-        .app:active .icon { transform: scale(0.85); }
 
         .modal {
             position: absolute; inset: 0;
@@ -94,15 +102,12 @@
             background: #000; border-bottom: 1px solid #1a1a1a;
         }
 
-        .back-btn { font-size: 24px; margin-right: 16px; cursor: pointer; color: #3b82f6; }
+        .back-btn { font-size: 24px; margin-right: 16px; cursor: pointer; color: #3b82f6; padding: 10px; }
         
         .modal-content { flex: 1; overflow-y: auto; padding: 10px 0; }
-        .item { 
-            padding: 20px 24px; border-bottom: 1px solid #111; 
-            display: flex; flex-direction: column;
-        }
+        .item { padding: 20px 24px; border-bottom: 1px solid #111; }
         .item p { margin: 0; font-size: 16px; font-weight: 500; }
-        .item small { color: var(--subtext); margin-top: 4px; font-size: 13px; }
+        .item small { color: var(--subtext); margin-top: 4px; font-size: 13px; display: block; }
 
         .nav-zone {
             width: 100%; height: 40px;
@@ -112,7 +117,7 @@
         }
         .nav-handle { width: 120px; height: 5px; background: rgba(255,255,255,0.3); border-radius: 10px; }
 
-        .bottom-area { margin-top: auto; width: 100%; padding-bottom: 20px; }
+        .bottom-area { margin-top: auto; width: 100%; padding-bottom: 20px; pointer-events: none; }
         .search-bar {
             background: rgba(255,255,255,0.08); height: 50px; border-radius: 25px;
             display: flex; align-items: center; padding: 0 20px; color: var(--subtext);
@@ -132,7 +137,7 @@
         </div>
 
         <div class="app-grid">
-            <div class="app" id="settings-icon">
+            <div class="app" id="settings-trigger">
                 <div class="icon">⚙️</div>
                 <span>Settings</span>
             </div>
@@ -145,13 +150,13 @@
 
     <div id="settings-page" class="modal">
         <div class="modal-header">
-            <span class="back-btn" id="close-settings">←</span>
+            <span class="back-btn" id="close-btn">←</span>
             <span>Settings</span>
         </div>
         <div class="modal-content">
-            <div class="item"><p>System</p><small>Dark Mode OS 0.8.5</small></div>
-            <div class="item"><p>Display</p><small>Brightness Fixed</small></div>
-            <div class="item"><p>Developer</p><small>weirzxx</small></div>
+            <div class="item"><p>System</p><small>OS 0.8.6 Build Fix</small></div>
+            <div class="item"><p>Touch Engine</p><small>Native Click Priority</small></div>
+            <div class="item"><p>Developer</p><small>@weirzxx</small></div>
         </div>
     </div>
 
@@ -163,10 +168,10 @@
 <script>
     const home = document.getElementById('home-screen');
     const frame = document.querySelector('.phone-frame');
-    const settingsApp = document.getElementById('settings-page');
-    const settingsIcon = document.getElementById('settings-icon');
-    const closeBtn = document.getElementById('close-settings');
-    let activeApp = null;
+    const settingsPage = document.getElementById('settings-page');
+    const trigger = document.getElementById('settings-trigger');
+    const closeBtn = document.getElementById('close-btn');
+    let active = false;
 
     function updateTime() {
         const now = new Date();
@@ -175,51 +180,51 @@
     }
     setInterval(updateTime, 1000); updateTime();
 
-    // Новый чистый обработчик открытия
-    settingsIcon.addEventListener('click', () => {
-        const rect = settingsIcon.getBoundingClientRect();
+    // Прямой обработчик без делегирования
+    trigger.onclick = function(e) {
+        e.preventDefault();
+        const rect = trigger.getBoundingClientRect();
         const frameRect = frame.getBoundingClientRect();
-        
         const x = (rect.left + rect.width / 2) - (frameRect.left + frameRect.width / 2);
         const y = (rect.top + rect.height / 2) - (frameRect.top + frameRect.height / 2);
 
-        settingsApp.style.display = 'flex';
-        settingsApp.style.transition = 'none';
-        settingsApp.style.transform = `translate(${x}px, ${y}px) scale(0.1)`;
-        settingsApp.style.opacity = '0';
+        settingsPage.style.display = 'flex';
+        settingsPage.style.transition = 'none';
+        settingsPage.style.transform = `translate(${x}px, ${y}px) scale(0.1)`;
+        settingsPage.style.opacity = '0';
 
         setTimeout(() => {
-            settingsApp.style.transition = 'transform 0.6s var(--spring), opacity 0.4s ease';
-            settingsApp.classList.add('active');
+            settingsPage.style.transition = 'transform 0.6s var(--spring), opacity 0.4s ease';
+            settingsPage.classList.add('active');
             home.classList.add('home-dimmed');
-            activeApp = settingsApp;
+            active = true;
         }, 10);
-    });
+    };
 
     function closeApp() {
-        if (!activeApp) return;
-        const rect = settingsIcon.getBoundingClientRect();
+        if (!active) return;
+        const rect = trigger.getBoundingClientRect();
         const frameRect = frame.getBoundingClientRect();
         const x = (rect.left + rect.width / 2) - (frameRect.left + frameRect.width / 2);
         const y = (rect.top + rect.height / 2) - (frameRect.top + frameRect.height / 2);
 
-        activeApp.classList.remove('active');
-        activeApp.style.transform = `translate(${x}px, ${y}px) scale(0.1)`;
-        activeApp.style.opacity = '0';
+        settingsPage.classList.remove('active');
+        settingsPage.style.transform = `translate(${x}px, ${y}px) scale(0.1)`;
+        settingsPage.style.opacity = '0';
         home.classList.remove('home-dimmed');
 
         setTimeout(() => {
-            activeApp.style.display = 'none';
-            activeApp = null;
+            settingsPage.style.display = 'none';
+            active = false;
         }, 600);
     }
 
-    closeBtn.addEventListener('click', closeApp);
+    closeBtn.onclick = closeApp;
 
     let startY = 0;
     document.getElementById('nav-zone').addEventListener('touchstart', e => { startY = e.touches[0].clientY; });
     document.getElementById('nav-zone').addEventListener('touchend', e => {
-        if (activeApp && (startY - e.changedTouches[0].clientY > 40)) closeApp();
+        if (active && (startY - e.changedTouches[0].clientY > 40)) closeApp();
     });
 </script>
 </body>
