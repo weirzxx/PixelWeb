@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>PixelWeb OS 0.5 Beta</title>
+    <title>PixelWeb OS 0.6 Beta</title>
     <style>
         :root {
             --bg: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
@@ -54,12 +54,9 @@
             border: 2px solid #222;
         }
 
-        /* Контейнер для эффекта отдаления фона */
         #home-screen {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column;
             justify-content: space-between;
             padding: 45px 18px 20px;
             box-sizing: border-box;
@@ -67,9 +64,9 @@
         }
 
         .home-dimmed {
-            transform: scale(0.9);
-            opacity: 0.5;
-            filter: blur(4px);
+            transform: scale(0.93);
+            opacity: 0.6;
+            filter: blur(5px);
         }
 
         .at-a-glance h1 { margin: 0; font-size: 32px; font-weight: 300; }
@@ -82,10 +79,8 @@
         }
 
         .app {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-size: 11px;
+            display: flex; flex-direction: column;
+            align-items: center; font-size: 11px;
             cursor: pointer;
         }
 
@@ -94,10 +89,8 @@
             background: var(--glass);
             border-radius: 17px;
             backdrop-filter: blur(10px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
+            display: flex; align-items: center;
+            justify-content: center; font-size: 28px;
             margin-bottom: 5px;
             border: 1px solid rgba(255,255,255,0.1);
             transition: transform 0.2s;
@@ -117,54 +110,56 @@
         .dock { display: flex; justify-content: space-between; padding: 0 5px 10px; }
         .dock-icon { width: 50px; height: 50px; border-radius: 50%; }
 
-        /* Полоска навигации */
+        .nav-zone {
+            width: 100%; height: 40px;
+            position: absolute; bottom: 0; left: 0;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 2000; touch-action: none;
+        }
+
         .nav-handle {
             width: 120px; height: 4px;
             background: rgba(255,255,255,0.6);
             border-radius: 2px;
-            position: absolute;
-            bottom: 10px; left: 50%;
-            transform: translateX(-50%);
-            z-index: 2000;
-            touch-action: none;
+            transition: background 0.3s, width 0.3s;
         }
 
-        /* Приложение (Модалка) */
         .modal {
-            position: absolute;
-            inset: 0;
-            background: #f8f9fa;
-            color: #202124;
-            z-index: 1000;
-            border-radius: 48px;
-            display: none;
-            opacity: 0;
-            transform: scale(0.8) translateY(20%);
-            transition: transform 0.5s var(--spring), opacity 0.3s ease, border-radius 0.5s;
+            position: absolute; inset: 0;
+            background: #f8f9fa; color: #202124;
+            z-index: 1000; border-radius: 48px;
+            display: none; opacity: 0;
+            transform: scale(0.9) translateY(100%);
+            transition: transform 0.5s var(--spring), opacity 0.3s ease;
             overflow: hidden;
         }
 
-        .modal.active {
-            display: block;
-            opacity: 1;
-            transform: scale(1) translateY(0);
-        }
-
-        /* Анимация закрытия жестом */
-        .modal.closing {
-            transform: scale(0.9) translateY(100%);
-            opacity: 0;
-        }
+        .modal.active { display: block; opacity: 1; transform: scale(1) translateY(0); }
 
         .modal-header {
-            padding: 20px; font-size: 20px;
-            display: flex; align-items: center;
+            padding: 40px 20px 20px; font-size: 24px;
+            font-weight: 500; display: flex; align-items: center;
             background: #fff; border-bottom: 1px solid #eee;
         }
-        .back-btn { font-size: 24px; margin-right: 15px; cursor: pointer; color: #1a73e8; }
-        .item { padding: 16px 20px; border-bottom: 1px solid #f0f0f0; background: #fff; }
+        .back-btn { font-size: 28px; margin-right: 15px; cursor: pointer; color: #1a73e8; }
+        .item { padding: 18px 20px; border-bottom: 1px solid #f0f0f0; background: #fff; cursor: pointer; }
+        .item:active { background: #f1f3f4; }
         .item p { margin: 0; font-weight: 500; }
         .item small { color: #777; }
+
+        #changelog-page {
+            position: absolute; inset: 0;
+            background: #fff; z-index: 1100;
+            transform: translateX(100%);
+            transition: transform 0.4s var(--spring);
+            display: flex; flex-direction: column;
+        }
+        #changelog-page.open { transform: translateX(0); }
+
+        .log-content { padding: 20px; overflow-y: auto; flex: 1; color: #3c4043; }
+        .log-version { border-left: 3px solid #1a73e8; padding-left: 15px; margin-bottom: 25px; }
+        .log-version h3 { margin: 0 0 5px 0; color: #1a73e8; font-size: 18px; }
+        .log-version ul { margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.6; }
     </style>
 </head>
 <body>
@@ -179,7 +174,7 @@
         </div>
 
         <div class="app-grid">
-            <div class="app" id="app-settings" onclick="openApp()">
+            <div class="app" onclick="openApp()">
                 <div class="icon">⚙️</div>
                 <span>Settings</span>
             </div>
@@ -196,20 +191,54 @@
         </div>
     </div>
 
-    <div id="nav-handle" class="nav-handle"></div>
+    <div class="nav-zone" id="nav-zone">
+        <div id="nav-handle" class="nav-handle"></div>
+    </div>
 
     <div id="settings-page" class="modal">
         <div class="modal-header">
             <span class="back-btn" onclick="closeApp()">←</span>
             <span>Settings</span>
         </div>
-        <div class="item" onclick="alert('PixelWeb 0.5 Beta\nDev: weirzxx')">
-            <p>About Phone</p>
-            <small>PixelWeb 0.5 Beta | @weirzxx1</small>
+        <div class="item" onclick="openChangelog()">
+            <p>Changelogs</p>
+            <small>PixelWeb update history</small>
         </div>
-        <div class="item">
-            <p>System</p>
-            <small>HTML 5 / PixelWeb Core</small>
+        <div class="item" onclick="alert('PixelWeb 0.6 Beta\nDev: weirzxx')">
+            <p>About Phone</p>
+            <small>PixelWeb 0.6 Beta | @weirzxx1</small>
+        </div>
+
+        <div id="changelog-page">
+            <div class="modal-header">
+                <span class="back-btn" onclick="closeChangelog()">←</span>
+                <span>Changelogs</span>
+            </div>
+            <div class="log-content">
+                <div class="log-version">
+                    <h3>0.6 Beta (Current)</h3>
+                    <ul>
+                        <li>Added Changelogs section</li>
+                        <li>Improved navigation gesture hitbox</li>
+                        <li>Fixed Settings header spacing</li>
+                    </ul>
+                </div>
+                <div class="log-version">
+                    <h3>0.5 Beta</h3>
+                    <ul>
+                        <li>Integrated Gesture Engine (nav handle)</li>
+                        <li>Added depth effect (Background blur)</li>
+                        <li>Spring animation for windows</li>
+                    </ul>
+                </div>
+                <div class="log-version">
+                    <h3>0.4 Beta</h3>
+                    <ul>
+                        <li>Dot-notch redesign (12px)</li>
+                        <li>Added navigation handle</li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -218,6 +247,8 @@
     const home = document.getElementById('home-screen');
     const modal = document.getElementById('settings-page');
     const handle = document.getElementById('nav-handle');
+    const zone = document.getElementById('nav-zone');
+    const changelog = document.getElementById('changelog-page');
 
     function updateTime() {
         const now = new Date();
@@ -226,7 +257,6 @@
     }
     setInterval(updateTime, 1000); updateTime();
 
-    // Открытие с эффектом глубины
     function openApp() {
         modal.style.display = 'block';
         setTimeout(() => {
@@ -236,34 +266,45 @@
     }
 
     function closeApp() {
+        closeChangelog();
         home.classList.remove('home-dimmed');
         modal.classList.remove('active');
         setTimeout(() => { modal.style.display = 'none'; }, 500);
     }
 
-    // ЛОГИКА ЖЕСТОВ (Полоска)
+    function openChangelog() { changelog.classList.add('open'); }
+    function closeChangelog() { changelog.classList.remove('open'); }
+
     let startY = 0;
-    handle.addEventListener('touchstart', e => {
+    let isActive = false;
+
+    zone.addEventListener('touchstart', e => {
+        if (!modal.classList.contains('active')) return;
         startY = e.touches[0].clientY;
+        isActive = true;
         handle.style.background = 'rgba(255,255,255,1)';
+        handle.style.width = '140px';
     });
 
-    handle.addEventListener('touchmove', e => {
-        let currentY = e.touches[0].clientY;
-        let diff = startY - currentY;
-        if (diff > 50 && modal.classList.contains('active')) {
-            // Визуальный отклик при тяге вверх
-            modal.style.transform = `scale(${1 - diff/1000}) translateY(${-diff/2}px)`;
+    zone.addEventListener('touchmove', e => {
+        if (!isActive) return;
+        let diff = startY - e.touches[0].clientY;
+        if (diff > 0) {
+            modal.style.transition = 'none';
+            modal.style.transform = `scale(${1 - diff/1200}) translateY(${-diff/1.2}px)`;
+            modal.style.borderRadius = `${48 + diff/10}px`;
         }
     });
 
-    handle.addEventListener('touchend', e => {
-        let endY = e.changedTouches[0].clientY;
+    zone.addEventListener('touchend', e => {
+        if (!isActive) return;
+        let diff = startY - e.changedTouches[0].clientY;
+        isActive = false;
         handle.style.background = 'rgba(255,255,255,0.6)';
-        if (startY - endY > 100) {
-            closeApp(); // Если свайпнули высоко — закрываем
-        }
-        modal.style.transform = ''; // Сброс трансформации
+        handle.style.width = '120px';
+        modal.style.transition = '';
+        if (diff > 100) closeApp();
+        else { modal.style.transform = ''; modal.style.borderRadius = ''; }
     });
 </script>
 
