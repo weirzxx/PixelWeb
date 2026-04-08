@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>PixelWeb OS 0.3</title>
+    <title>PixelWeb OS 0.4 Beta</title>
     <style>
         :root {
             --bg: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%);
@@ -25,30 +25,35 @@
             align-items: center;
         }
 
+        /* --- КОРПУС ТЕЛЕФОНА (СДЕЛАН МЕНЬШЕ И ИЗЯЩНЕЕ) --- */
         .phone-frame {
-            width: 92vw;
-            height: 92vh;
-            max-width: 400px;
-            max-height: 800px;
+            width: 88vw; /* Было 95vw */
+            height: 88vh; /* Было 95vh */
+            max-width: 380px; /* Было 420px */
+            max-height: 800px; /* Было 850px */
             background: var(--bg);
-            border: 8px solid #222;
-            border-radius: 45px;
+            border: 10px solid #222;
+            border-radius: 48px;
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.7);
+            transition: all 0.3s ease;
         }
 
+        /* --- ТОЧКА-КАМЕРА ВМЕСТО ЧЁЛКИ --- */
         .notch {
             position: absolute;
-            top: 0; left: 50%;
+            top: 15px; /* Чуть ниже от края */
+            left: 50%;
             transform: translateX(-50%);
-            width: 40%; height: 25px;
-            background: #222;
-            border-bottom-left-radius: 15px;
-            border-bottom-right-radius: 15px;
+            width: 14px; /* Маленькая точка */
+            height: 14px;
+            background: #111; /* Тёмный объектив */
+            border-radius: 50%; /* Круглая */
             z-index: 100;
+            border: 2px solid #222; /* Ободок */
         }
 
         .screen {
@@ -56,30 +61,32 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 40px 20px 20px;
+            padding: 45px 18px 25px; /* Чуть больше отступ сверху из-за камеры */
         }
 
-        .at-a-glance h1 { margin: 0; font-size: 32px; font-weight: 400; }
-        .at-a-glance p { margin: 5px 0; opacity: 0.8; }
+        .at-a-glance h1 { margin: 0; font-size: 32px; font-weight: 300; }
+        .at-a-glance p { margin: 5px 0; opacity: 0.8; font-size: 17px; }
 
         .app-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            padding-top: 30px;
+            gap: 18px;
+            margin-top: 15px;
         }
 
         .app {
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-size: 12px;
+            font-size: 11px;
+            transition: transform 0.1s;
         }
+        .app:active { transform: scale(0.92); }
 
         .icon {
-            width: 55px; height: 55px;
+            width: 58px; height: 58px;
             background: var(--glass);
-            border-radius: 15px;
+            border-radius: 17px;
             backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
@@ -90,124 +97,3 @@
         }
 
         .bottom-nav { width: 100%; }
-
-        .search-bar {
-            background: rgba(255,255,255,0.9);
-            height: 45px;
-            border-radius: 22px;
-            display: flex;
-            align-items: center;
-            padding: 0 15px;
-            color: #555;
-            margin-bottom: 20px;
-        }
-
-        .dock {
-            display: flex;
-            justify-content: space-around;
-            padding-bottom: 10px;
-        }
-
-        .dock-icon { width: 50px; height: 50px; border-radius: 50%; }
-
-        /* Settings Modal */
-        .modal {
-            display: none;
-            position: absolute;
-            inset: 0;
-            background: #f8f9fa;
-            color: #202124;
-            z-index: 1000;
-            opacity: 0;
-            transform: scale(0.9);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .modal.active {
-            display: block;
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        .modal-header {
-            padding: 20px;
-            font-size: 20px;
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .back-btn { font-size: 24px; margin-right: 20px; cursor: pointer; color: #1a73e8; }
-        .item { padding: 15px 20px; border-bottom: 1px solid #eee; }
-        .item p { margin: 0; font-weight: 500; }
-        .item small { color: #777; }
-    </style>
-</head>
-<body>
-
-<div class="phone-frame">
-    <div class="notch"></div>
-    
-    <div class="screen">
-        <div class="at-a-glance">
-            <h1 id="clock">00:00</h1>
-            <p id="date">Loading...</p>
-        </div>
-
-        <div class="app-grid">
-            <div class="app" onclick="openSettings()">
-                <div class="icon">⚙️</div>
-                <span>Settings</span>
-            </div>
-        </div>
-
-        <div class="bottom-nav">
-            <div class="search-bar">Google Search...</div>
-            <div class="dock">
-                <div class="dock-icon" style="background:#34a853"></div>
-                <div class="dock-icon" style="background:#4285f4"></div>
-                <div class="dock-icon" style="background:#fbbc05"></div>
-                <div class="dock-icon" style="background:#ea4335"></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="settings" class="modal">
-        <div class="modal-header">
-            <span class="back-btn" onclick="closeSettings()">←</span>
-            <span>Settings</span>
-        </div>
-        <div class="item" onclick="alert('PixelWeb 0.3 Alpha\nDev: weirzxx\nTikTok: @weirzxx1')">
-            <p>About Phone</p>
-            <small>PixelWeb 0.3 Alpha</small>
-        </div>
-        <div class="item"><p>System</p><small>Build 2026.04.08</small></div>
-        <div class="item"><p>Display</p><small>Pixel Style</small></div>
-    </div>
-</div>
-
-<script>
-    function updateTime() {
-        const now = new Date();
-        document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-        document.getElementById('date').innerText = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
-    }
-
-    function openSettings() {
-        const m = document.getElementById('settings');
-        m.style.display = 'block';
-        setTimeout(() => m.classList.add('active'), 10);
-    }
-
-    function closeSettings() {
-        const m = document.getElementById('settings');
-        m.classList.remove('active');
-        setTimeout(() => m.style.display = 'none', 300);
-    }
-
-    setInterval(updateTime, 1000);
-    updateTime();
-</script>
-
-</body>
-</html>
