@@ -1,24 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>PixelWeb OS Core</title>
     <style>
         :root {
-            --bg: #000;
-            --text: #fff;
-            --subtext: #888;
-            --accent-bg: #1a1a1a;
-            --blue: #4285F4;
-            --panel-bg: rgba(20, 20, 20, 0.95);
+            --pixel-blue: #4285F4;
+            --bg-dark: #05070a;
+            --panel-glass: rgba(15, 20, 25, 0.85);
+            --border-white: rgba(255, 255, 255, 0.1);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; margin: 0; padding: 0; }
         
         body, html { 
             height: 100%; 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            font-family: 'Segoe UI', Roboto, -apple-system, sans-serif; 
             background: #0d1117; 
             color: #fff; 
             overflow: hidden; 
@@ -27,7 +25,6 @@
             align-items: center; 
         }
 
-        /* Центрирование "телефона" на экране ПК */
         .phone-frame { 
             width: 100vw; 
             height: 100vh; 
@@ -36,196 +33,193 @@
             overflow: hidden; 
             display: flex; 
             flex-direction: column; 
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
         }
         
         @media (min-width: 500px) {
             .phone-frame { 
                 width: 380px; 
                 height: 800px; 
-                border: 12px solid #222; 
-                border-radius: 54px; 
+                border: 10px solid #1a1a1a; 
+                border-radius: 50px; 
+                box-shadow: 0 0 100px rgba(66, 133, 244, 0.15);
             }
         }
 
-        /* BOOT SCREEN */
-        #boot-screen { position: absolute; inset: 0; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.8s ease; }
-        .boot-container { text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .boot-logo-text { font-size: 32px; font-weight: 600; letter-spacing: -1px; margin-bottom: 8px; }
-        .boot-version-text { font-size: 14px; color: var(--subtext); }
-        .boot-loader-container { position: absolute; bottom: 100px; width: 120px; height: 3px; background: #222; border-radius: 10px; overflow: hidden; }
-        #boot-bar { width: 0%; height: 100%; background: #fff; transition: width 3s cubic-bezier(0.1, 0, 0.3, 1); }
+        #boot-screen { 
+            position: absolute; inset: 0; background: #000; z-index: 9999; 
+            display: flex; justify-content: center; align-items: center; 
+            transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        .boot-logo { text-align: center; }
+        .boot-logo h1 { font-size: 36px; font-weight: 700; letter-spacing: -1.5px; margin-bottom: 5px; }
+        .boot-logo p { font-size: 12px; color: #444; text-transform: uppercase; letter-spacing: 2px; }
+        
+        .loader-track { 
+            position: absolute; bottom: 80px; width: 100px; height: 2px; 
+            background: #111; border-radius: 1px; overflow: hidden; 
+        }
+        #loader-bar { width: 0%; height: 100%; background: var(--pixel-blue); transition: width 3s linear; }
 
-        /* HOME SCREEN */
         #home-screen { 
-            width: 100%; 
-            height: 100%; 
-            padding: 60px 24px; 
-            /* Твои новые обои */
-            background: url('https://i.ibb.co/Lhb8Z3m/edited-image.jpg') center/cover no-repeat;
-            transition: transform 0.4s ease, opacity 0.4s ease, filter 0.4s ease; 
+            width: 100%; height: 100%; padding: 60px 20px; 
+            background: linear-gradient(180deg, #0f172a 0%, #000000 100%);
+            transition: transform 0.5s ease, filter 0.5s ease, opacity 0.5s ease;
         }
-        .home-hidden { transform: scale(0.95); opacity: 0.5; filter: blur(10px); }
+        .home-blur { transform: scale(0.92); filter: blur(15px); opacity: 0.6; }
 
-        #clock { font-size: 64px; font-weight: 300; text-align: center; margin-top: 20px; text-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-        #date { font-size: 18px; color: #ccc; text-align: center; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .status-area { text-align: center; margin-bottom: 40px; }
+        #clock { font-size: 72px; font-weight: 200; text-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        #date { font-size: 16px; color: rgba(255,255,255,0.6); margin-top: -5px; }
 
-        /* APPS */
-        .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 40px 0; }
-        .app-item { text-align: center; cursor: pointer; }
+        .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .app-box { text-align: center; cursor: pointer; }
         .app-icon { 
-            width: 56px; height: 56px; 
-            background: rgba(30, 30, 30, 0.7); 
-            backdrop-filter: blur(10px);
-            border-radius: 14px; 
-            margin: 0 auto 8px; 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 30px;
-            border: 1px solid rgba(255,255,255,0.1);
+            width: 60px; height: 60px; background: var(--panel-glass); 
+            backdrop-filter: blur(12px); border-radius: 16px; margin: 0 auto 8px; 
+            display: flex; align-items: center; justify-content: center; font-size: 28px;
+            border: 1px solid var(--border-white); transition: transform 0.2s;
         }
-        .app-label { font-size: 11px; color: #fff; text-shadow: 0 1px 3px #000; }
+        .app-box:active .app-icon { transform: scale(0.9); }
+        .app-label { font-size: 11px; font-weight: 400; color: rgba(255,255,255,0.9); }
 
-        /* DOCK */
-        .bottom-bar { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); width: 90%; height: 64px; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(25px); border-radius: 32px; display: flex; justify-content: space-evenly; align-items: center; border: 1px solid rgba(255,255,255,0.1); }
-        .dock-icon { width: 44px; height: 44px; background: rgba(50,50,50,0.5); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; }
+        .pixel-dock { 
+            position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%); 
+            width: 92%; height: 70px; background: rgba(255, 255, 255, 0.08); 
+            backdrop-filter: blur(25px); border-radius: 35px; 
+            display: flex; justify-content: space-evenly; align-items: center;
+            border: 1px solid var(--border-white); z-index: 100;
+        }
 
-        /* MODALS */
-        .modal { 
+        .pixel-modal { 
             position: absolute; inset: 0; background: #000; z-index: 2000; 
-            display: none; opacity: 0; transform: scale(0.8);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+            display: none; opacity: 0; transform: scale(0.5);
+            transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); 
             flex-direction: column; 
         }
-        .modal.active { display: flex; opacity: 1; transform: scale(1); }
-        .modal-header { padding: 50px 24px 15px; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; font-size: 19px; }
-        .modal-content { flex: 1; overflow-y: auto; padding: 20px; }
-        .item { padding: 16px 0; border-bottom: 1px solid #111; cursor: pointer; }
-
-        /* CONTROL CENTER */
-        #control-center { position: absolute; top: -100%; left: 0; width: 100%; height: 100%; background: var(--panel-bg); backdrop-filter: blur(30px); z-index: 5000; transition: all 0.4s cubic-bezier(0.1, 0, 0.3, 1); padding: 60px 24px; opacity: 0; }
-        #control-center.active { top: 0; opacity: 1; }
-        .status-bar-touch { position: absolute; top: 0; left: 0; width: 100%; height: 40px; z-index: 6000; cursor: pointer; }
+        .pixel-modal.active { display: flex; opacity: 1; transform: scale(1); }
         
-        .home-indicator { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 120px; height: 5px; background: rgba(255,255,255,0.6); border-radius: 10px; z-index: 7000; cursor: pointer; }
+        .header { padding: 50px 24px 20px; display: flex; align-items: center; font-size: 20px; font-weight: 600; border-bottom: 1px solid #111; }
+        .back-btn { font-size: 26px; color: var(--pixel-blue); margin-right: 15px; cursor: pointer; }
+        .content { flex: 1; overflow-y: auto; padding: 20px; }
+        
+        .list-item { 
+            padding: 18px 0; border-bottom: 1px solid #111; cursor: pointer; 
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .home-pill { 
+            position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); 
+            width: 120px; height: 4px; background: rgba(255,255,255,0.3); 
+            border-radius: 2px; z-index: 9000; cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
 <div class="phone-frame">
     <div id="boot-screen">
-        <div class="boot-container">
-            <div class="boot-logo-text">PixelWeb</div>
-            <div class="boot-version-text">0.10.2 Beta</div>
-            <div class="boot-loader-container">
-                <div id="boot-bar"></div>
-            </div>
+        <div class="boot-logo">
+            <h1>PixelWeb</h1>
+            <p>OS Core</p>
         </div>
-    </div>
-
-    <div class="status-bar-touch" onclick="toggleCC()"></div>
-
-    <div id="control-center">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
-            <span style="color: #888;">Control Center</span>
-            <span onclick="toggleCC()" style="cursor: pointer; font-size: 20px;">✕</span>
-        </div>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-            <div class="item" style="background: #333; border-radius: 20px; padding: 20px; text-align: center;">📶 Wi-Fi</div>
-            <div class="item" style="background: #333; border-radius: 20px; padding: 20px; text-align: center;">🦷 Bluetooth</div>
-        </div>
+        <div class="loader-track"><div id="loader-bar"></div></div>
     </div>
 
     <div id="home-screen">
-        <h1 id="clock">00:00</h1>
-        <p id="date">Loading...</p>
-
+        <div class="status-area">
+            <h1 id="clock">00:00</h1>
+            <p id="date">Загрузка...</p>
+        </div>
         <div class="app-grid">
-            <div class="app-item" onclick="openApp('settings-page', event)">
+            <div class="app-box" onclick="openPixelApp('settings-page', event)">
                 <div class="app-icon">⚙️</div>
                 <div class="app-label">Settings</div>
             </div>
         </div>
-
-        <div class="bottom-bar">
-            <div class="dock-icon" onclick="openApp('phone-page', event)">📞</div>
-            <div class="dock-icon" onclick="openApp('messages-page', event)">💬</div>
-            <div class="dock-icon" onclick="openApp('chrome-page', event)">🌐</div>
-            <div class="dock-icon" onclick="openApp('camera-page', event)">📷</div>
+        <div class="pixel-dock">
+            <div class="app-icon" style="width:48px; height:48px;" onclick="openPixelApp('phone', event)">📞</div>
+            <div class="app-icon" style="width:48px; height:48px;" onclick="openPixelApp('chat', event)">💬</div>
+            <div class="app-icon" style="width:48px; height:48px;" onclick="openPixelApp('web', event)">🌐</div>
+            <div class="app-icon" style="width:48px; height:48px;" onclick="openPixelApp('cam', event)">📷</div>
         </div>
     </div>
 
-    <div id="settings-page" class="modal">
-        <div class="modal-header"><span onclick="closeApp('settings-page')" style="color:var(--blue); cursor:pointer; margin-right:15px;">←</span> Settings</div>
-        <div class="modal-content">
-            <div class="item" onclick="openApp('about-page', event)">About Phone</div>
+    <div id="settings-page" class="pixel-modal">
+        <div class="header"><span class="back-btn" onclick="closePixelApp('settings-page')">←</span> Settings</div>
+        <div class="content">
+            <div class="list-item" onclick="openPixelApp('about-page', event)">
+                <div>
+                    <p>About Device</p>
+                    <small style="color:#666">PixelWeb v0.10.2</small>
+                </div>
+                <span style="color:#333">→</span>
+            </div>
         </div>
     </div>
 
-    <div id="about-page" class="modal">
-        <div class="modal-header"><span onclick="closeApp('about-page')" style="color:var(--blue); cursor:pointer; margin-right:15px;">←</span> About</div>
-        <div class="modal-content">
-            <p>PixelWeb OS v0.10.2</p>
-            <p style="color: #888; font-size: 14px;">Dev: @weirzxx1</p>
+    <div id="about-page" class="pixel-modal">
+        <div class="header"><span class="back-btn" onclick="closePixelApp('about-page')">←</span> About</div>
+        <div class="content">
+            <h2 style="margin-bottom:10px;">PixelWeb OS</h2>
+            <p style="color:#888; line-height:1.6">Версия: 0.10.2 Beta<br>Разработчик: @weirzxx1<br>Ядро: WebKit PixelCore</p>
+            <div class="list-item" style="margin-top:20px; border-top:1px solid #111">
+                <p>System Update</p>
+                <small style="color:var(--pixel-blue)">Latest version</small>
+            </div>
         </div>
     </div>
 
-    <div id="phone-page" class="modal"><div class="modal-header"><span onclick="closeApp('phone-page')">←</span> Phone</div></div>
-    <div id="messages-page" class="modal"><div class="modal-header"><span onclick="closeApp('messages-page')">←</span> Messages</div></div>
-    <div id="chrome-page" class="modal"><div class="modal-header"><span onclick="closeApp('chrome-page')">←</span> Browser</div></div>
-    <div id="camera-page" class="modal"><div class="modal-header"><span onclick="closeApp('camera-page')">←</span> Camera</div></div>
+    <div id="phone" class="pixel-modal"><div class="header"><span class="back-btn" onclick="closePixelApp('phone')">←</span> Phone</div></div>
+    <div id="chat" class="pixel-modal"><div class="header"><span class="back-btn" onclick="closePixelApp('chat')">←</span> Messages</div></div>
+    <div id="web" class="pixel-modal"><div class="header"><span class="back-btn" onclick="closePixelApp('web')">←</span> Browser</div></div>
+    <div id="cam" class="pixel-modal"><div class="header"><span class="back-btn" onclick="closePixelApp('cam')">←</span> Camera</div></div>
 
-    <div class="home-indicator" onclick="closeAllApps()"></div>
+    <div class="home-pill" onclick="goHome()"></div>
 </div>
 
 <script>
-    // Загрузка
     window.onload = () => {
-        const bar = document.getElementById('boot-bar');
-        bar.style.width = '100%';
+        document.getElementById('loader-bar').style.width = '100%';
         setTimeout(() => {
-            document.getElementById('boot-screen').style.opacity = '0';
-            setTimeout(() => { document.getElementById('boot-screen').style.display = 'none'; }, 800);
-        }, 3200);
+            const boot = document.getElementById('boot-screen');
+            boot.style.opacity = '0';
+            setTimeout(() => boot.style.display = 'none', 1000);
+        }, 3000);
     };
 
-    // Время
-    function updateTime() {
+    function ticTac() {
         const now = new Date();
-        document.getElementById('clock').textContent = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-        document.getElementById('date').textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+        document.getElementById('clock').textContent = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('date').textContent = now.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' });
     }
-    setInterval(updateTime, 1000); updateTime();
+    setInterval(ticTac, 1000); ticTac();
 
-    // Функции системы
-    function openApp(id, event) {
-        const el = document.getElementById(id);
-        if (event) {
-            const rect = event.currentTarget.getBoundingClientRect();
-            el.style.transformOrigin = `${rect.left + rect.width/2}px ${rect.top + rect.height/2}px`;
+    function openPixelApp(id, ev) {
+        const app = document.getElementById(id);
+        if (ev) {
+            const r = ev.currentTarget.getBoundingClientRect();
+            app.style.transformOrigin = `${r.left + r.width/2}px ${r.top + r.height/2}px`;
         }
-        el.style.display = 'flex';
-        setTimeout(() => el.classList.add('active'), 10);
-        document.getElementById('home-screen').classList.add('home-hidden');
+        app.style.display = 'flex';
+        setTimeout(() => app.classList.add('active'), 10);
+        document.getElementById('home-screen').classList.add('home-blur');
     }
 
-    function closeApp(id) {
-        const el = document.getElementById(id);
-        el.classList.remove('active');
-        if (document.querySelectorAll('.modal.active').length <= 1) {
-            document.getElementById('home-screen').classList.remove('home-hidden');
+    function closePixelApp(id) {
+        const app = document.getElementById(id);
+        app.classList.remove('active');
+        if (document.querySelectorAll('.pixel-modal.active').length <= 1) {
+            document.getElementById('home-screen').classList.remove('home-blur');
         }
-        setTimeout(() => { el.style.display = 'none'; }, 400);
+        setTimeout(() => app.style.display = 'none', 450);
     }
 
-    function closeAllApps() {
-        document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
-        document.getElementById('home-screen').classList.remove('home-hidden');
-        document.getElementById('control-center').classList.remove('active');
-        setTimeout(() => { document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); }, 400);
-    }
-
-    function toggleCC() {
-        document.getElementById('control-center').classList.toggle('active');
+    function goHome() {
+        document.querySelectorAll('.pixel-modal').forEach(m => m.classList.remove('active'));
+        document.getElementById('home-screen').classList.remove('home-blur');
+        setTimeout(() => {
+            document.querySelectorAll('.pixel-modal').forEach(m => m.style.display = 'none');
+        }, 450);
     }
 </script>
 
