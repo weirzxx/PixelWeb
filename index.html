@@ -74,16 +74,16 @@
         </div>
 
         <div class="bottom-bar">
-            <div class="dock-icon" onclick="alert('Phone')">📞</div>
-            <div class="dock-icon" onclick="alert('Messages')">💬</div>
-            <div class="dock-icon" onclick="alert('Chrome')">🌐</div>
-            <div class="dock-icon" onclick="alert('Camera')">📷</div>
+            <div class="dock-icon" onclick="openApp('phone-page')">📞</div>
+            <div class="dock-icon" onclick="openApp('messages-page')">💬</div>
+            <div class="dock-icon" onclick="openApp('chrome-page')">🌐</div>
+            <div class="dock-icon" onclick="openApp('camera-page')">📷</div>
         </div>
     </div>
 
     <div id="settings-page" class="modal">
         <div class="modal-header" style="padding: 50px 24px 15px; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center;">
-            <span onclick="closeApp()" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span>
+            <span onclick="closeApp('settings-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span>
             <span style="font-weight: 500;">Settings</span>
         </div>
         <div class="modal-content">
@@ -91,6 +91,46 @@
                 <p style="margin: 0; font-size: 16px;">About Phone</p>
                 <small style="color:var(--subtext);">PixelWeb Core 0.9.1</small>
             </div>
+        </div>
+    </div>
+
+    <div id="phone-page" class="modal">
+        <div class="modal-header" style="padding: 50px 24px 15px; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center;">
+            <span onclick="closeApp('phone-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span>
+            <span style="font-weight: 500;">Phone</span>
+        </div>
+        <div class="modal-content" style="padding: 24px; text-align: center;">
+            <p style="color: var(--subtext); margin-top: 50px;">No recent calls</p>
+        </div>
+    </div>
+
+    <div id="messages-page" class="modal">
+        <div class="modal-header" style="padding: 50px 24px 15px; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center;">
+            <span onclick="closeApp('messages-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span>
+            <span style="font-weight: 500;">Messages</span>
+        </div>
+        <div class="modal-content" style="padding: 24px; text-align: center;">
+            <p style="color: var(--subtext); margin-top: 50px;">No messages yet</p>
+        </div>
+    </div>
+
+    <div id="chrome-page" class="modal">
+        <div class="modal-header" style="padding: 50px 24px 15px; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center;">
+            <span onclick="closeApp('chrome-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span>
+            <span style="font-weight: 500;">Chrome</span>
+        </div>
+        <div class="modal-content" style="padding: 24px; text-align: center;">
+            <p style="color: var(--subtext); margin-top: 50px;">Search or type URL</p>
+        </div>
+    </div>
+
+    <div id="camera-page" class="modal">
+        <div class="modal-header" style="padding: 50px 24px 15px; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center;">
+            <span onclick="closeApp('camera-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span>
+            <span style="font-weight: 500;">Camera</span>
+        </div>
+        <div class="modal-content" style="padding: 24px; text-align: center; height: 100%; display: flex; align-items: center; justify-content: center;">
+            <div style="width: 80%; height: 60%; border: 2px dashed #333; border-radius: 20px; display: flex; align-items: center; justify-content: center; color: #333;">Camera Preview</div>
         </div>
     </div>
 
@@ -141,7 +181,8 @@
         const el = document.getElementById(id);
         el.style.display = 'flex';
         setTimeout(() => el.classList.add('active'), 10);
-        if(id === 'settings-page') document.getElementById('home-screen').classList.add('home-hidden');
+        // Скрываем главный экран только если открываем основные приложения (не вложенные страницы)
+        if(id !== 'about-page') document.getElementById('home-screen').classList.add('home-hidden');
     }
 
     function backToSettings(id) {
@@ -149,10 +190,10 @@
         setTimeout(() => document.getElementById(id).style.display = 'none', 450);
     }
 
-    function closeApp() {
-        document.getElementById('settings-page').classList.remove('active');
+    function closeApp(id) {
+        document.getElementById(id).classList.remove('active');
         document.getElementById('home-screen').classList.remove('home-hidden');
-        setTimeout(() => document.getElementById('settings-page').style.display = 'none', 450);
+        setTimeout(() => document.getElementById(id).style.display = 'none', 450);
     }
 </script>
 </body>
