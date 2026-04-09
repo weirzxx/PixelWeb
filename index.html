@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>PixelWeb OS 0.9.1 Core</title>
-    
+    <title>PixelWeb OS Core</title>
     <link rel="stylesheet" href="css/root.css">
     <link rel="stylesheet" href="css/boot.css">
 </head>
@@ -13,7 +12,6 @@
 <div id="boot-screen">
     <div class="boot-container">
         <div id="boot-glow"></div>
-        
         <div id="google-logo" style="display:none;">
             <svg viewBox="0 0 24 24" width="60" height="60">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -32,7 +30,7 @@
     <div id="home-screen">
         <div class="widget-clock" style="text-align: center; margin-top: 40px;">
             <h1 id="clock" style="font-size: 64px; font-weight: 300; margin: 0;">00:00</h1>
-            <p id="date" style="color: var(--subtext); font-size: 18px; margin: 5px 0 0;">Загрузка...</p>
+            <p id="date" style="color: var(--subtext); font-size: 18px; margin: 5px 0 0;">Loading...</p>
         </div>
         <div class="app-grid" style="display: flex; justify-content: center; margin-top: 50px;">
             <div class="app" onclick="openApp('settings-page')" style="cursor: pointer; text-align: center;">
@@ -64,14 +62,13 @@
             <p style="color: var(--subtext); margin-bottom: 4px; font-size: 14px;">Developer</p>
             <p style="margin: 0 0 20px; font-size: 18px;">weirzxx</p>
             <p style="color: var(--subtext); margin-bottom: 4px; font-size: 14px;">System</p>
-            <p style="margin: 0 0 20px; font-size: 18px;">System HTML 5 | PixelWeb Core</p>
+            <p style="margin: 0 0 20px; font-size: 18px;">HTML5 | PixelWeb Core</p>
             <div style="text-align: center; margin-top: 50px; opacity: 0.5;">TikTok: @weirzxx1</div>
         </div>
     </div>
 </div>
 
 <script>
-    // Логика заставки (как на видео)
     window.addEventListener('load', () => {
         const glow = document.getElementById('boot-glow');
         const logo = document.getElementById('google-logo');
@@ -79,16 +76,11 @@
         const bar = document.getElementById('boot-bar');
         const screen = document.getElementById('boot-screen');
 
-        // 1. Показываем ромб 2.5 секунды
         setTimeout(() => {
             glow.style.display = 'none';
             logo.style.display = 'block';
             progress.style.display = 'block';
-            
-            // 2. Заполняем полоску
             setTimeout(() => { bar.style.width = '100%'; }, 100);
-            
-            // 3. Плавно убираем экран загрузки
             setTimeout(() => {
                 screen.style.opacity = '0';
                 setTimeout(() => { screen.style.display = 'none'; }, 800);
@@ -98,10 +90,11 @@
 
     function updateTime() {
         const now = new Date();
-        document.getElementById('clock').innerText = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
-        document.getElementById('date').innerText = now.toLocaleDateString('ru-RU', { weekday: 'long', month: 'short', day: 'numeric' });
+        document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('date').innerText = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
     }
-    setInterval(updateTime, 1000); updateTime();
+    setInterval(updateTime, 1000); 
+    updateTime();
 
     function openApp(id) {
         const el = document.getElementById(id);
@@ -109,10 +102,12 @@
         setTimeout(() => el.classList.add('active'), 10);
         if(id === 'settings-page') document.getElementById('home-screen').classList.add('home-hidden');
     }
+
     function backToSettings(id) {
         document.getElementById(id).classList.remove('active');
         setTimeout(() => document.getElementById(id).style.display = 'none', 450);
     }
+
     function closeApp() {
         document.getElementById('settings-page').classList.remove('active');
         document.getElementById('home-screen').classList.remove('home-hidden');
