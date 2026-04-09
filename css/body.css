@@ -1,216 +1,246 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>PixelWeb OS Core</title>
-    <style>
-        :root {
-            --bg: #000;
-            --text: #fff;
-            --subtext: #888;
-            --accent-bg: #1a1a1a;
-            --blue: #4285F4;
-            --panel-bg: rgba(20, 20, 20, 0.95);
-        }
+:root {
+    --bg: #000;
+    --text: #fff;
+    --subtext: #888;
+    --accent-bg: #1a1a1a;
+    --blue: #4285F4;
+    --panel-bg: rgba(20, 20, 20, 0.95);
+}
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; margin: 0; padding: 0; }
-        body, html { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #000; color: #fff; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+* { 
+    box-sizing: border-box; 
+    -webkit-tap-highlight-color: transparent; 
+    user-select: none; 
+    margin: 0; 
+    padding: 0; 
+}
 
-        .phone-frame { width: 100vw; height: 100vh; background: #000; position: relative; overflow: hidden; display: flex; flex-direction: column; }
-        
-        @media (min-width: 500px) {
-            .phone-frame { width: 380px; height: 800px; border: 12px solid #222; border-radius: 54px; }
-        }
+body, html { 
+    height: 100%; 
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+    background: #000; 
+    color: #fff; 
+    overflow: hidden; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+}
 
-        /* BOOT SCREEN */
-        #boot-screen { position: absolute; inset: 0; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.8s ease; }
-        .boot-container { text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        
-        /* НОВОЕ ТЕКСТОВОЕ ЛОГО */
-        .boot-logo-text { font-size: 32px; font-weight: 600; letter-spacing: -1px; margin-bottom: 8px; }
-        .boot-version-text { font-size: 14px; color: var(--subtext); font-weight: 400; }
+.phone-frame { 
+    width: 100vw; 
+    height: 100vh; 
+    background: #000; 
+    position: relative; 
+    overflow: hidden; 
+    display: flex; 
+    flex-direction: column; 
+}
 
-        .boot-loader-container { position: absolute; bottom: 100px; width: 120px; height: 3px; background: #222; border-radius: 10px; overflow: hidden; }
-        #boot-bar { width: 0%; height: 100%; background: #fff; transition: width 3s cubic-bezier(0.1, 0, 0.3, 1); }
-
-        /* CONTROL CENTER */
-        #control-center { position: absolute; top: -100%; left: 0; width: 100%; height: 100%; background: var(--panel-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 5000; transition: top 0.4s cubic-bezier(0.1, 0, 0.3, 1); padding: 60px 24px; pointer-events: none; opacity: 0; }
-        #control-center.active { top: 0; pointer-events: auto; opacity: 1; }
-        .status-bar-touch { position: absolute; top: 0; left: 0; width: 100%; height: 40px; z-index: 6000; cursor: pointer; }
-        
-        .qs-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 20px; }
-        .qs-tile { background: #333; padding: 16px; border-radius: 24px; display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .qs-tile.on { background: var(--blue); color: #000; }
-
-        /* HOME SCREEN */
-        #home-screen { width: 100%; height: 100%; padding: 60px 24px; background: linear-gradient(180deg, #101827 0%, #000 100%); transition: transform 0.4s ease, opacity 0.4s ease, filter 0.4s ease; }
-        .home-hidden { transform: scale(0.95); opacity: 0.5; filter: blur(8px); }
-        
-        .bottom-bar { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); width: 90%; height: 64px; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); border-radius: 32px; display: flex; justify-content: space-evenly; align-items: center; z-index: 100; }
-        .dock-icon { width: 44px; height: 44px; background: #333; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; }
-
-        /* MODALS */
-        .modal { position: absolute; inset: 0; background: #000; z-index: 2000; display: none; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); flex-direction: column; }
-        .modal.active { display: flex; transform: translateY(0); }
-        .modal-header { padding: 50px 24px 15px; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; font-size: 19px; }
-        .modal-content { flex: 1; overflow-y: auto; padding: 20px; }
-        .item { padding: 16px 0; border-bottom: 1px solid #111; cursor: pointer; }
-
-        .home-indicator { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 120px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 10px; z-index: 7000; cursor: pointer; }
-    </style>
-</head>
-<body>
-
-<div class="status-bar-touch" onclick="toggleCC()"></div>
-
-<div id="control-center">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-        <span style="font-size: 14px; color: #ccc;">PixelWeb Carrier</span>
-        <span onclick="toggleCC()" style="font-size: 24px; cursor: pointer;">✕</span>
-    </div>
-    <div class="qs-grid">
-        <div class="qs-tile on" onclick="this.classList.toggle('on')"><i>📶</i><span>Wi-Fi</span></div>
-        <div class="qs-tile on" onclick="this.classList.toggle('on')"><i>🦷</i><span>Bluetooth</span></div>
-        <div class="qs-tile" onclick="this.classList.toggle('on')"><i>🔦</i><span>Flashlight</span></div>
-        <div class="qs-tile" onclick="this.classList.toggle('on')"><i>✈️</i><span>Airplane</span></div>
-    </div>
-</div>
-
-<div id="boot-screen">
-    <div class="boot-container">
-        <div class="boot-logo-text">PixelWeb</div>
-        <div class="boot-version-text">0.10.2 Beta</div>
-        <div class="boot-loader-container">
-            <div id="boot-bar"></div>
-        </div>
-    </div>
-</div>
-
-<div class="phone-frame">
-    <div id="home-screen">
-        <div style="text-align: center; margin-top: 40px;">
-            <h1 id="clock" style="font-size: 64px; font-weight: 300; margin: 0;">00:00</h1>
-            <p id="date" style="color: #888; font-size: 18px; margin-top: 5px;">Loading...</p>
-        </div>
-        
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 40px 0;">
-            <div class="app" onclick="openApp('settings-page')" style="text-align: center; cursor: pointer;">
-                <div style="font-size: 30px; background: #222; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; border-radius: 14px; margin: 0 auto 8px;">⚙️</div>
-                <span style="font-size: 11px; color: #888;">Settings</span>
-            </div>
-        </div>
-
-        <div class="bottom-bar">
-            <div class="dock-icon" onclick="openApp('phone-page')">📞</div>
-            <div class="dock-icon" onclick="openApp('messages-page')">💬</div>
-            <div class="dock-icon" onclick="openApp('chrome-page')">🌐</div>
-            <div class="dock-icon" onclick="openApp('camera-page')">📷</div>
-        </div>
-    </div>
-
-    <div id="settings-page" class="modal">
-        <div class="modal-header">
-            <span onclick="closeApp('settings-page')" style="color:#4285F4; cursor:pointer; font-size:24px; margin-right:15px;">←</span>
-            <span>Settings</span>
-        </div>
-        <div class="modal-content">
-            <div class="item" onclick="openApp('about-page')">
-                <p>About Phone</p>
-                <small>0.10.2 Beta</small>
-            </div>
-        </div>
-    </div>
-
-    <div id="about-page" class="modal">
-        <div class="modal-header">
-            <span onclick="closeApp('about-page')" style="color:#4285F4; cursor:pointer; font-size:24px; margin-right:15px;">←</span>
-            <span>About Phone</span>
-        </div>
-        <div class="modal-content">
-            <div class="item" onclick="openApp('changelogs-page')">
-                <p>Changelogs</p>
-                <small>0.10.2 Beta | @weirzxx1</small>
-            </div>
-            <p style="color: #888; margin-top: 20px; font-size: 14px;">Developer</p>
-            <p style="font-size: 18px;">@weirzxx1</p>
-        </div>
-    </div>
-
-    <div id="changelogs-page" class="modal">
-        <div class="modal-header">
-            <span onclick="closeApp('changelogs-page')" style="color:#4285F4; cursor:pointer; font-size:24px; margin-right:15px;">←</span>
-            <span>Changelogs</span>
-        </div>
-        <div class="modal-content">
-            <p style="font-weight: 500; margin-bottom: 10px;">0.10.2 Beta:</p>
-            <ul style="list-style: none; color: #888; font-size: 14px; line-height: 1.6;">
-                <li>• Replaced image logo with clean text branding.</li>
-                <li>• Updated system version to 0.10.2 Beta.</li>
-                <li>• Fixed boot screen asset loading issues.</li>
-            </ul>
-        </div>
-    </div>
-
-    <div id="phone-page" class="modal"><div class="modal-header"><span onclick="closeApp('phone-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span><span>Phone</span></div></div>
-    <div id="messages-page" class="modal"><div class="modal-header"><span onclick="closeApp('messages-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span><span>Messages</span></div></div>
-    <div id="chrome-page" class="modal"><div class="modal-header"><span onclick="closeApp('chrome-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span><span>Chrome</span></div></div>
-    <div id="camera-page" class="modal"><div class="modal-header"><span onclick="closeApp('camera-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span><span>Camera</span></div></div>
-
-    <div class="home-indicator" onclick="closeAllApps()"></div>
-</div>
-
-<script>
-    window.addEventListener('load', () => {
-        setTimeout(() => { 
-            const bar = document.getElementById('boot-bar');
-            if(bar) bar.style.width = '100%'; 
-        }, 100);
-        setTimeout(() => {
-            const boot = document.getElementById('boot-screen');
-            if(boot) {
-                boot.style.opacity = '0';
-                setTimeout(() => { boot.style.display = 'none'; }, 800);
-            }
-        }, 3500);
-    });
-
-    function updateTime() {
-        const now = new Date();
-        document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-        document.getElementById('date').innerText = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+@media (min-width: 500px) {
+    .phone-frame { 
+        width: 380px; 
+        height: 800px; 
+        border: 12px solid #222; 
+        border-radius: 54px; 
     }
-    setInterval(updateTime, 1000); updateTime();
+}
 
-    function openApp(id) {
-        const el = document.getElementById(id);
-        el.style.display = 'flex';
-        setTimeout(() => el.classList.add('active'), 10);
-        document.getElementById('home-screen').classList.add('home-hidden');
-    }
+/* BOOT SCREEN */
+#boot-screen { 
+    position: absolute; 
+    inset: 0; 
+    background: #000; 
+    z-index: 9999; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    transition: opacity 0.8s ease; 
+}
 
-    function closeApp(id) {
-        const el = document.getElementById(id);
-        el.classList.remove('active');
-        if (document.querySelectorAll('.modal.active').length <= 1) {
-            document.getElementById('home-screen').classList.remove('home-hidden');
-        }
-        setTimeout(() => { el.style.display = 'none'; }, 400);
-    }
+.boot-container { 
+    text-align: center; 
+    width: 100%; 
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    justify-content: center; 
+}
 
-    function closeAllApps() {
-        const activeModals = document.querySelectorAll('.modal.active');
-        activeModals.forEach(modal => {
-            modal.classList.remove('active');
-            setTimeout(() => { modal.style.display = 'none'; }, 400);
-        });
-        document.getElementById('home-screen').classList.remove('home-hidden');
-        document.getElementById('control-center').classList.remove('active');
-    }
+.boot-logo-text { 
+    font-size: 32px; 
+    font-weight: 600; 
+    letter-spacing: -1px; 
+    margin-bottom: 8px; 
+}
 
-    function toggleCC() {
-        document.getElementById('control-center').classList.toggle('active');
-    }
-</script>
-</body>
-</html>
+.boot-version-text { 
+    font-size: 14px; 
+    color: var(--subtext); 
+    font-weight: 400; 
+}
+
+.boot-loader-container { 
+    position: absolute; 
+    bottom: 100px; 
+    width: 120px; 
+    height: 3px; 
+    background: #222; 
+    border-radius: 10px; 
+    overflow: hidden; 
+}
+
+#boot-bar { 
+    width: 0%; 
+    height: 100%; 
+    background: #fff; 
+    transition: width 3s cubic-bezier(0.1, 0, 0.3, 1); 
+}
+
+/* CONTROL CENTER */
+#control-center { 
+    position: absolute; 
+    top: -100%; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: var(--panel-bg); 
+    backdrop-filter: blur(25px); 
+    -webkit-backdrop-filter: blur(25px); 
+    z-index: 5000; 
+    transition: top 0.4s cubic-bezier(0.1, 0, 0.3, 1); 
+    padding: 60px 24px; 
+    pointer-events: none; 
+    opacity: 0; 
+}
+
+#control-center.active { 
+    top: 0; 
+    pointer-events: auto; 
+    opacity: 1; 
+}
+
+.status-bar-touch { 
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 40px; 
+    z-index: 6000; 
+    cursor: pointer; 
+}
+
+.qs-grid { 
+    display: grid; 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 12px; 
+    margin-top: 20px; 
+}
+
+.qs-tile { 
+    background: #333; 
+    padding: 16px; 
+    border-radius: 24px; 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    cursor: pointer; 
+}
+
+.qs-tile.on { 
+    background: var(--blue); 
+    color: #000; 
+}
+
+/* HOME SCREEN */
+#home-screen { 
+    width: 100%; 
+    height: 100%; 
+    padding: 60px 24px; 
+    background: linear-gradient(180deg, #101827 0%, #000 100%); 
+    transition: transform 0.4s ease, opacity 0.4s ease, filter 0.4s ease; 
+}
+
+.home-hidden { 
+    transform: scale(0.95); 
+    opacity: 0.5; 
+    filter: blur(8px); 
+}
+
+.bottom-bar { 
+    position: absolute; 
+    bottom: 30px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    width: 90%; 
+    height: 64px; 
+    background: rgba(255, 255, 255, 0.1); 
+    backdrop-filter: blur(20px); 
+    border-radius: 32px; 
+    display: flex; 
+    justify-content: space-evenly; 
+    align-items: center; 
+    z-index: 100; 
+}
+
+.dock-icon { 
+    width: 44px; 
+    height: 44px; 
+    background: #333; 
+    border-radius: 12px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 22px; 
+    cursor: pointer; 
+}
+
+/* MODALS */
+.modal { 
+    position: absolute; 
+    inset: 0; 
+    background: #000; 
+    z-index: 2000; 
+    display: none; 
+    transform: translateY(100%); 
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+    flex-direction: column; 
+}
+
+.modal.active { 
+    display: flex; 
+    transform: translateY(0); 
+}
+
+.modal-header { 
+    padding: 50px 24px 15px; 
+    border-bottom: 1px solid #1a1a1a; 
+    display: flex; 
+    align-items: center; 
+    font-size: 19px; 
+}
+
+.modal-content { 
+    flex: 1; 
+    overflow-y: auto; 
+    padding: 20px; 
+}
+
+.item { 
+    padding: 16px 0; 
+    border-bottom: 1px solid #111; 
+    cursor: pointer; 
+}
+
+/* GESTURE */
+.home-indicator { 
+    position: absolute; 
+    bottom: 8px; 
+    left: 50%; 
+    transform: translateX(-50%); 
+    width: 120px; 
+    height: 5px; 
+    background: rgba(255,255,255,0.8); 
+    border-radius: 10px; 
+    z-index: 7000; 
+    cursor: pointer; 
+}
