@@ -1,0 +1,98 @@
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  margin: 0;
+  padding: 0;
+}
+
+body, html {
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.phone-frame {
+    width: 88vw;
+    height: 88vh;
+    max-width: 380px;
+    max-height: 800px;
+    background: #000;
+    border: 12px solid #222;
+    border-radius: 54px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+#home-screen {
+    width: 100%;
+    height: 100%;
+    padding: 60px 24px;
+    background: linear-gradient(180deg, #101827 0%, #000 100%);
+    transition: transform 0.4s ease, opacity 0.4s ease, filter 0.4s ease;
+}
+
+.home-hidden {
+    transform: scale(0.95);
+    opacity: 0.5;
+    filter: blur(8px);
+}
+
+.modal {
+    position: absolute;
+    inset: 0;
+    background: #000;
+    z-index: 2000;
+    border-radius: 42px; /* Чуть меньше, чем у фрейма */
+    display: none;
+    transform: translateY(100%);
+    transition: transform 0.45s var(--spring), opacity 0.3s ease;
+    flex-direction: column;
+}
+
+.modal.active {
+    display: flex;
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.modal-header {
+    padding: 50px 24px 15px;
+    border-bottom: 1px solid #1a1a1a;
+    display: flex;
+    align-items: center;
+    font-size: 19px;
+    font-weight: 500;
+}
+
+.modal-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 0;
+}
+
+.item {
+    padding: 16px 24px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.item:active {
+    background: var(--accent-bg);
+}
+
+.item p {
+    font-size: 17px;
+}
+
+.item small {
+    color: var(--subtext);
+    font-size: 14px;
+}
