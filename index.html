@@ -4,53 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>PixelWeb OS Core</title>
-    <link rel="stylesheet" href="root.css">
-    <link rel="stylesheet" href="boot.css">
-    <link rel="stylesheet" href="body.css">
     <style>
-        .bottom-bar {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            height: 64px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 32px;
-            display: flex;
-            justify-content: space-evenly;
-            align-items: center;
-            z-index: 100;
+        /* ROOT & VARIABLES */
+        :root {
+            --bg: #000;
+            --text: #fff;
+            --subtext: #888;
+            --accent-bg: #1a1a1a;
+            --blue: #4285F4;
         }
 
-        .dock-icon {
-            width: 42px;
-            height: 42px;
-            background: #333;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            cursor: pointer;
-            transition: transform 0.2s;
+        /* BODY STYLES */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; margin: 0; padding: 0; }
+        body, html { height: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #000; color: #fff; overflow: hidden; display: flex; justify-content: center; align-items: center; }
+
+        .phone-frame { width: 100vw; height: 100vh; background: #000; position: relative; overflow: hidden; display: flex; flex-direction: column; }
+        
+        @media (min-width: 500px) {
+            .phone-frame { width: 380px; height: 800px; border: 12px solid #222; border-radius: 54px; }
         }
 
-        .home-indicator {
-            position: absolute;
-            bottom: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 120px;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 10px;
-            z-index: 3000;
-            cursor: grab;
-            transition: transform 0.2s, background 0.3s;
-        }
+        /* BOOT SCREEN */
+        #boot-screen { position: absolute; inset: 0; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.8s ease; }
+        .boot-container { text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center; }
+        #boot-glow { width: 150px; height: 150px; background: radial-gradient(circle, rgba(66,133,244,0.3) 0%, transparent 70%); filter: blur(20px); animation: pulse 2s infinite; }
+        #boot-progress { width: 120px; height: 3px; background: #222; border-radius: 10px; margin-top: 40px; overflow: hidden; display: none; }
+        #boot-bar { width: 0%; height: 100%; background: #fff; transition: width 2.5s cubic-bezier(0.1, 0, 0.3, 1); }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.2); opacity: 0.8; } }
+
+        /* HOME SCREEN */
+        #home-screen { width: 100%; height: 100%; padding: 60px 24px; background: linear-gradient(180deg, #101827 0%, #000 100%); transition: transform 0.4s ease, opacity 0.4s ease, filter 0.4s ease; }
+        .home-hidden { transform: scale(0.95); opacity: 0.5; filter: blur(8px); }
+        
+        .bottom-bar { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); width: 90%; height: 64px; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-radius: 32px; display: flex; justify-content: space-evenly; align-items: center; z-index: 100; }
+        .dock-icon { width: 42px; height: 42px; background: #333; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; }
+
+        /* MODALS */
+        .modal { position: absolute; inset: 0; background: #000; z-index: 2000; display: none; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); flex-direction: column; }
+        .modal.active { display: flex; transform: translateY(0); }
+        .modal-header { padding: 50px 24px 15px; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; font-size: 19px; }
+        .modal-content { flex: 1; overflow-y: auto; padding: 20px; }
+        .item { padding: 16px 0; border-bottom: 1px solid #111; cursor: pointer; }
+        .item p { font-size: 17px; margin-bottom: 4px; }
+        .item small { color: #888; }
+
+        .home-indicator { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 120px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 10px; z-index: 3000; }
     </style>
 </head>
 <body>
@@ -72,27 +70,29 @@
 
 <div class="phone-frame">
     <div id="home-screen">
-        <div class="widget-clock" style="text-align: center; margin-top: 40px;">
+        <div style="text-align: center; margin-top: 40px;">
             <h1 id="clock" style="font-size: 64px; font-weight: 300; margin: 0;">00:00</h1>
-            <p id="date" style="color: var(--subtext); font-size: 18px; margin: 5px 0 0;">Loading...</p>
+            <p id="date" style="color: #888; font-size: 18px; margin-top: 5px;">Loading...</p>
         </div>
-        <div class="app-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 40px 20px;">
-            <div class="app" onclick="openApp('settings-page')" style="text-align: center;">
-                <div class="icon" style="font-size: 30px; background: #222; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; border-radius: 14px; margin: 0 auto 8px;">⚙️</div>
-                <span style="font-size: 11px; color: var(--subtext);">Settings</span>
+        
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 40px 0;">
+            <div class="app" onclick="openApp('settings-page')" style="text-align: center; cursor: pointer;">
+                <div style="font-size: 30px; background: #222; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; border-radius: 14px; margin: 0 auto 8px;">⚙️</div>
+                <span style="font-size: 11px; color: #888;">Settings</span>
             </div>
         </div>
+
         <div class="bottom-bar">
-            <div class="dock-icon" onclick="openApp('phone-page')">📞</div>
-            <div class="dock-icon" onclick="openApp('messages-page')">💬</div>
-            <div class="dock-icon" onclick="openApp('chrome-page')">🌐</div>
-            <div class="dock-icon" onclick="openApp('camera-page')">📷</div>
+            <div class="dock-icon">📞</div>
+            <div class="dock-icon">💬</div>
+            <div class="dock-icon">🌐</div>
+            <div class="dock-icon">📷</div>
         </div>
     </div>
 
     <div id="settings-page" class="modal">
         <div class="modal-header">
-            <span onclick="closeApp('settings-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span>
+            <span onclick="closeApp('settings-page')" style="color:#4285F4; cursor:pointer; font-size:24px; margin-right:15px;">←</span>
             <span>Settings</span>
         </div>
         <div class="modal-content">
@@ -105,39 +105,34 @@
 
     <div id="about-page" class="modal">
         <div class="modal-header">
-            <span onclick="backToSettings('about-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span>
+            <span onclick="backToSettings('about-page')" style="color:#4285F4; cursor:pointer; font-size:24px; margin-right:15px;">←</span>
             <span>About Phone</span>
         </div>
-        <div class="modal-content" style="padding: 24px;">
-            <div class="item" onclick="openApp('changelogs-page')" style="padding: 16px 0;">
+        <div class="modal-content">
+            <div class="item" onclick="openApp('changelogs-page')">
                 <p>Changelogs</p>
-                <small>Build 260409 | weirzxx1</small>
+                <small>Build 260409 | weirzxx</small>
             </div>
-            <p style="color: var(--subtext); margin: 20px 0 4px; font-size: 14px;">Developer</p>
-            <p style="margin: 0 0 20px; font-size: 18px;">weirzxx</p>
+            <p style="color: #888; margin-top: 20px; font-size: 14px;">Developer</p>
+            <p style="font-size: 18px;">weirzxx</p>
         </div>
     </div>
 
     <div id="changelogs-page" class="modal">
         <div class="modal-header">
-            <span onclick="closeApp('changelogs-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span>
+            <span onclick="closeApp('changelogs-page')" style="color:#4285F4; cursor:pointer; font-size:24px; margin-right:15px;">←</span>
             <span>Changelogs</span>
         </div>
-        <div class="modal-content" style="padding: 24px; font-size: 15px; line-height: 1.6; color: var(--subtext);">
-            <p style="color: var(--text); font-weight: 500; margin-bottom: 10px;">Build 260409 Core:</p>
-            <ul>
-                <li>• Added system-wide CSS modularization.</li>
+        <div class="modal-content">
+            <p style="font-weight: 500; margin-bottom: 10px;">Build 260409 Core:</p>
+            <ul style="list-style: none; color: #888;">
+                <li>• All-in-one HTML structure (No CSS files needed).</li>
                 <li>• Restored Changelogs menu.</li>
-                <li>• Fixed background overlay issues in Settings.</li>
-                <li>• Cleaned up code structure.</li>
+                <li>• Fixed white screen issues.</li>
+                <li>• Optimized for mobile view.</li>
             </ul>
         </div>
     </div>
-
-    <div id="phone-page" class="modal"><div class="modal-header"><span onclick="closeApp('phone-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span><span>Phone</span></div></div>
-    <div id="messages-page" class="modal"><div class="modal-header"><span onclick="closeApp('messages-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span><span>Messages</span></div></div>
-    <div id="chrome-page" class="modal"><div class="modal-header"><span onclick="closeApp('chrome-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span><span>Chrome</span></div></div>
-    <div id="camera-page" class="modal"><div class="modal-header"><span onclick="closeApp('camera-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span><span>Camera</span></div></div>
 
     <div class="home-indicator" id="home-gesture"></div>
 </div>
@@ -153,7 +148,7 @@
                 document.getElementById('boot-screen').style.opacity = '0';
                 setTimeout(() => { document.getElementById('boot-screen').style.display = 'none'; }, 800);
             }, 3000);
-        }, 2500);
+        }, 1500);
     });
 
     function updateTime() {
@@ -174,29 +169,14 @@
         const el = document.getElementById(id);
         el.classList.remove('active');
         document.getElementById('home-screen').classList.remove('home-hidden');
-        setTimeout(() => { el.style.display = 'none'; }, 450);
+        setTimeout(() => { el.style.display = 'none'; }, 400);
     }
 
     function backToSettings(id) {
         const el = document.getElementById(id);
         el.classList.remove('active');
-        setTimeout(() => { el.style.display = 'none'; }, 450);
+        setTimeout(() => { el.style.display = 'none'; }, 400);
     }
-
-    let touchStartY = 0;
-    const homeIndicator = document.getElementById('home-gesture');
-    homeIndicator.addEventListener('touchstart', (e) => { touchStartY = e.touches[0].clientY; });
-    homeIndicator.addEventListener('touchend', (e) => {
-        const touchEndY = e.changedTouches[0].clientY;
-        if (touchStartY - touchEndY > 50) {
-            const activeModals = document.querySelectorAll('.modal.active');
-            activeModals.forEach(modal => {
-                modal.classList.remove('active');
-                setTimeout(() => { modal.style.display = 'none'; }, 450);
-            });
-            document.getElementById('home-screen').classList.remove('home-hidden');
-        }
-    });
 </script>
 </body>
 </html>
