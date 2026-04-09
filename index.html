@@ -3,230 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>PixelWeb OS 0.9.0 Core</title>
-    <style>
-        :root {
-            --bg: #000000;
-            --accent-bg: #111111;
-            --text: #ffffff;
-            --subtext: #888888;
-            --blue: #4285f4;
-            --spring: cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        body, html {
-            margin: 0; padding: 0; height: 100%;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #000; color: var(--text);
-            overflow: hidden; display: flex;
-            justify-content: center; align-items: center;
-            user-select: none; -webkit-tap-highlight-color: transparent;
-        }
-
-        .phone-frame {
-            width: 88vw; height: 88vh;
-            max-width: 380px; max-height: 800px;
-            background: #000;
-            border: 12px solid #222; border-radius: 54px;
-            position: relative; overflow: hidden;
-            display: flex; flex-direction: column;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-        }
-
-        .notch {
-            position: absolute; top: 12px; left: 50%;
-            transform: translateX(-50%); width: 100px; height: 26px;
-            background: #000; border-radius: 20px; z-index: 5000;
-        }
-
-        #home-screen {
-            width: 100%; height: 100%;
-            display: flex; flex-direction: column;
-            padding: 60px 24px 30px; box-sizing: border-box;
-            background: linear-gradient(180deg, #101827 0%, #000 100%);
-            transition: transform 0.4s ease, opacity 0.4s ease, filter 0.4s ease;
-        }
-
-        .home-hidden { transform: scale(0.95); opacity: 0.5; filter: blur(5px); }
-
-        .widget-clock { margin-bottom: 40px; }
-        .widget-clock h1 { font-size: 58px; font-weight: 200; margin: 0; letter-spacing: -2px; }
-        .widget-clock p { font-size: 18px; margin: 4px 0 0; color: var(--subtext); }
-
-        .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
-        .app { display: flex; flex-direction: column; align-items: center; font-size: 12px; cursor: pointer; }
-        .icon {
-            width: 62px; height: 62px;
-            background: var(--accent-bg); border-radius: 18px;
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 30px; margin-bottom: 8px;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .modal {
-            position: absolute; inset: 0;
-            background: #000; color: #fff;
-            z-index: 2000; border-radius: 42px;
-            display: none; opacity: 0;
-            transform: translateY(100%);
-            transition: transform 0.45s var(--spring), opacity 0.3s ease;
-            overflow: hidden; flex-direction: column;
-        }
-
-        .modal.active { display: flex; opacity: 1; transform: translateY(0); }
-
-        .modal-header {
-            padding: 50px 24px 15px; font-size: 20px;
-            font-weight: 600; display: flex; align-items: center;
-            background: #000; border-bottom: 1px solid #1a1a1a;
-        }
-
-        .back-btn { font-size: 24px; margin-right: 16px; cursor: pointer; color: var(--blue); padding: 5px; }
-        .modal-content { flex: 1; overflow-y: auto; }
-        
-        .section-title { padding: 20px 24px 8px; color: var(--blue); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-        .item { padding: 16px 24px; border-bottom: 1px solid #111; cursor: pointer; }
-        .item:active { background: #0a0a0a; }
-        .item p { margin: 0; font-size: 16px; font-weight: 400; }
-        .item small { color: var(--subtext); margin-top: 4px; font-size: 13px; display: block; line-height: 1.4; }
-
-        .footer-tag {
-            text-align: center; padding: 30px 20px; 
-            color: var(--subtext); font-size: 14px; opacity: 0.6;
-        }
-
-        .nav-zone {
-            width: 100%; height: 40px;
-            position: absolute; bottom: 0; left: 0;
-            display: flex; justify-content: center; align-items: center;
-            z-index: 4000;
-        }
-        .nav-handle { width: 100px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 10px; }
-    </style>
+    <title>PixelWeb OS 0.9.1 Core</title>
+    
+    <link rel="stylesheet" href="css/root.css">
+    <link rel="stylesheet" href="css/boot.css">
 </head>
 <body>
 
-<div class="phone-frame">
-    <div class="notch"></div>
-    
-    <div id="home-screen">
-        <div class="widget-clock">
-            <h1 id="clock">00:00</h1>
-            <p id="date">Loading...</p>
+<div id="boot-screen">
+    <div class="boot-container">
+        <div id="boot-glow"></div>
+        
+        <div id="google-logo" style="display:none;">
+            <svg viewBox="0 0 24 24" width="60" height="60">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 12-4.53z" fill="#EA4335"/>
+            </svg>
         </div>
+        <div id="boot-progress">
+            <div id="boot-bar"></div>
+        </div>
+    </div>
+</div>
 
-        <div class="app-grid">
-            <div class="app" onclick="openApp('settings-page')">
-                <div class="icon">⚙️</div>
-                <span>Settings</span>
+<div class="phone-frame">
+    <div id="home-screen">
+        <div class="widget-clock" style="text-align: center; margin-top: 40px;">
+            <h1 id="clock" style="font-size: 64px; font-weight: 300; margin: 0;">00:00</h1>
+            <p id="date" style="color: var(--subtext); font-size: 18px; margin: 5px 0 0;">Загрузка...</p>
+        </div>
+        <div class="app-grid" style="display: flex; justify-content: center; margin-top: 50px;">
+            <div class="app" onclick="openApp('settings-page')" style="cursor: pointer; text-align: center;">
+                <div class="icon" style="font-size: 40px; background: #222; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; border-radius: 16px; margin-bottom: 8px;">⚙️</div>
+                <span style="font-size: 12px; color: var(--subtext);">Settings</span>
             </div>
         </div>
     </div>
 
     <div id="settings-page" class="modal">
-        <div class="modal-header">
-            <span class="back-btn" onclick="closeApp()">←</span>
-            <span>Settings</span>
+        <div class="modal-header" style="padding: 50px 24px 15px; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center;">
+            <span onclick="closeApp()" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span>
+            <span style="font-weight: 500;">Settings</span>
         </div>
         <div class="modal-content">
-            <div class="section-title">General</div>
-            <div class="item" onclick="openApp('about-page')">
-                <p>About Phone</p>
-                <small>System HTML 5 | PixelWeb Core</small>
-            </div>
-            <div class="item" onclick="openApp('logs-page')">
-                <p>Changelogs</p>
-                <small>View update history</small>
+            <div class="item" style="padding: 20px 24px;" onclick="openApp('about-page')">
+                <p style="margin: 0; font-size: 16px;">About Phone</p>
+                <small style="color:var(--subtext);">PixelWeb Core 0.9.1</small>
             </div>
         </div>
     </div>
 
     <div id="about-page" class="modal">
-        <div class="modal-header">
-            <span class="back-btn" onclick="backToSettings('about-page')">←</span>
-            <span>About Phone</span>
+        <div class="modal-header" style="padding: 50px 24px 15px; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center;">
+            <span onclick="backToSettings('about-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span>
+            <span style="font-weight: 500;">About Phone</span>
         </div>
-        <div class="modal-content">
-            <div class="item"><p>Developer</p><small>weirzxx</small></div>
-            <div class="item"><p>System</p><small>System HTML 5 | PixelWeb Core</small></div>
-            <div class="item"><p>OS Version</p><small>0.9.0 Core Release</small></div>
-            
-            <div class="footer-tag">TikTok: @weirzxx1</div>
+        <div class="modal-content" style="padding: 24px;">
+            <p style="color: var(--subtext); margin-bottom: 4px; font-size: 14px;">Developer</p>
+            <p style="margin: 0 0 20px; font-size: 18px;">weirzxx</p>
+            <p style="color: var(--subtext); margin-bottom: 4px; font-size: 14px;">System</p>
+            <p style="margin: 0 0 20px; font-size: 18px;">System HTML 5 | PixelWeb Core</p>
+            <div style="text-align: center; margin-top: 50px; opacity: 0.5;">TikTok: @weirzxx1</div>
         </div>
-    </div>
-
-    <div id="logs-page" class="modal">
-        <div class="modal-header">
-            <span class="back-btn" onclick="backToSettings('logs-page')">←</span>
-            <span>Changelogs</span>
-        </div>
-        <div class="modal-content">
-            <div class="section-title">Current Update</div>
-            <div class="item">
-                <p>Version 0.9.0</p>
-                <small>• Added TikTok developer handle<br>• Refined legacy motion transitions<br>• Cleaned up core system identity</small>
-            </div>
-            <div class="section-title">Previous</div>
-            <div class="item">
-                <p>Version 0.8.9</p>
-                <small>• Updated System Info UI<br>• Stabilized Legacy Motion engine</small>
-            </div>
-        </div>
-    </div>
-
-    <div class="nav-zone" onclick="closeAllApps()">
-        <div class="nav-handle"></div>
     </div>
 </div>
 
 <script>
+    // Логика заставки (как на видео)
+    window.addEventListener('load', () => {
+        const glow = document.getElementById('boot-glow');
+        const logo = document.getElementById('google-logo');
+        const progress = document.getElementById('boot-progress');
+        const bar = document.getElementById('boot-bar');
+        const screen = document.getElementById('boot-screen');
+
+        // 1. Показываем ромб 2.5 секунды
+        setTimeout(() => {
+            glow.style.display = 'none';
+            logo.style.display = 'block';
+            progress.style.display = 'block';
+            
+            // 2. Заполняем полоску
+            setTimeout(() => { bar.style.width = '100%'; }, 100);
+            
+            // 3. Плавно убираем экран загрузки
+            setTimeout(() => {
+                screen.style.opacity = '0';
+                setTimeout(() => { screen.style.display = 'none'; }, 800);
+            }, 3000);
+        }, 2500);
+    });
+
     function updateTime() {
         const now = new Date();
-        document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-        document.getElementById('date').innerText = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+        document.getElementById('clock').innerText = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+        document.getElementById('date').innerText = now.toLocaleDateString('ru-RU', { weekday: 'long', month: 'short', day: 'numeric' });
     }
     setInterval(updateTime, 1000); updateTime();
 
-    let history = [];
-
     function openApp(id) {
-        const modal = document.getElementById(id);
-        const home = document.getElementById('home-screen');
-        
-        modal.style.display = 'flex';
-        setTimeout(() => {
-            modal.classList.add('active');
-            if (id === 'settings-page') home.classList.add('home-hidden');
-            history.push(id);
-        }, 10);
+        const el = document.getElementById(id);
+        el.style.display = 'flex';
+        setTimeout(() => el.classList.add('active'), 10);
+        if(id === 'settings-page') document.getElementById('home-screen').classList.add('home-hidden');
     }
-
-    function backToSettings(currentId) {
-        const modal = document.getElementById(currentId);
-        modal.classList.remove('active');
-        setTimeout(() => { modal.style.display = 'none'; }, 450);
-        history.pop();
+    function backToSettings(id) {
+        document.getElementById(id).classList.remove('active');
+        setTimeout(() => document.getElementById(id).style.display = 'none', 450);
     }
-
     function closeApp() {
-        const settings = document.getElementById('settings-page');
-        const home = document.getElementById('home-screen');
-        settings.classList.remove('active');
-        home.classList.remove('home-hidden');
-        setTimeout(() => { settings.style.display = 'none'; }, 450);
-        history = [];
-    }
-
-    function closeAllApps() {
-        document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+        document.getElementById('settings-page').classList.remove('active');
         document.getElementById('home-screen').classList.remove('home-hidden');
-        setTimeout(() => {
-            document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-        }, 450);
-        history = [];
+        setTimeout(() => document.getElementById('settings-page').style.display = 'none', 450);
     }
 </script>
 </body>
