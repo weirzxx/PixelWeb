@@ -6,6 +6,7 @@
     <title>PixelWeb OS Core</title>
     <link rel="stylesheet" href="css/root.css">
     <link rel="stylesheet" href="css/boot.css">
+    <link rel="stylesheet" href="css/body.css">
     <style>
         .bottom-bar {
             position: absolute;
@@ -50,11 +51,6 @@
             cursor: grab;
             transition: transform 0.2s, background 0.3s;
         }
-
-        .home-indicator:active {
-            cursor: grabbing;
-            background: #fff;
-        }
     </style>
 </head>
 <body>
@@ -80,14 +76,12 @@
             <h1 id="clock" style="font-size: 64px; font-weight: 300; margin: 0;">00:00</h1>
             <p id="date" style="color: var(--subtext); font-size: 18px; margin: 5px 0 0;">Loading...</p>
         </div>
-
         <div class="app-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 40px 20px;">
             <div class="app" onclick="openApp('settings-page')" style="text-align: center;">
                 <div class="icon" style="font-size: 30px; background: #222; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; border-radius: 14px; margin: 0 auto 8px;">⚙️</div>
                 <span style="font-size: 11px; color: var(--subtext);">Settings</span>
             </div>
         </div>
-
         <div class="bottom-bar">
             <div class="dock-icon" onclick="openApp('phone-page')">📞</div>
             <div class="dock-icon" onclick="openApp('messages-page')">💬</div>
@@ -98,7 +92,7 @@
 
     <div id="settings-page" class="modal">
         <div class="modal-header">
-            <span onclick="closeApp('settings-page')">←</span>
+            <span onclick="closeApp('settings-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span>
             <span>Settings</span>
         </div>
         <div class="modal-content">
@@ -109,42 +103,62 @@
         </div>
     </div>
 
+    <div id="about-page" class="modal">
+        <div class="modal-header">
+            <span onclick="backToSettings('about-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span>
+            <span>About Phone</span>
+        </div>
+        <div class="modal-content" style="padding: 24px;">
+            <div class="item" onclick="openApp('changelogs-page')" style="padding: 16px 0;">
+                <p>Changelogs</p>
+                <small>Build 260409 | weirzxx1</small>
+            </div>
+            <p style="color: var(--subtext); margin: 20px 0 4px; font-size: 14px;">Developer</p>
+            <p style="margin: 0 0 20px; font-size: 18px;">weirzxx</p>
+        </div>
+    </div>
+
+    <div id="changelogs-page" class="modal">
+        <div class="modal-header">
+            <span onclick="closeApp('changelogs-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span>
+            <span>Changelogs</span>
+        </div>
+        <div class="modal-content" style="padding: 24px; font-size: 15px; line-height: 1.6; color: var(--subtext);">
+            <p style="color: var(--text); font-weight: 500; margin-bottom: 10px;">Build 260409 Core:</p>
+            <ul>
+                <li>• Added system-wide CSS modularization.</li>
+                <li>• Restored Changelogs menu.</li>
+                <li>• Fixed background overlay issues in Settings.</li>
+                <li>• Cleaned up code structure.</li>
+            </ul>
+        </div>
+    </div>
+
     <div id="phone-page" class="modal">
         <div class="modal-header">
-            <span onclick="closeApp('phone-page')">←</span>
+            <span onclick="closeApp('phone-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span>
             <span>Phone</span>
         </div>
     </div>
 
     <div id="messages-page" class="modal">
         <div class="modal-header">
-            <span onclick="closeApp('messages-page')">←</span>
+            <span onclick="closeApp('messages-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span>
             <span>Messages</span>
         </div>
     </div>
 
     <div id="chrome-page" class="modal">
         <div class="modal-header">
-            <span onclick="closeApp('chrome-page')">←</span>
+            <span onclick="closeApp('chrome-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span>
             <span>Chrome</span>
         </div>
     </div>
 
     <div id="camera-page" class="modal">
         <div class="modal-header">
-            <span onclick="closeApp('camera-page')">←</span>
+            <span onclick="closeApp('camera-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span>
             <span>Camera</span>
-        </div>
-    </div>
-
-    <div id="about-page" class="modal">
-        <div class="modal-header">
-            <span onclick="backToSettings('about-page')">←</span>
-            <span>About</span>
-        </div>
-        <div class="modal-content" style="padding:20px;">
-            <p>Developer: weirzxx</p>
-            <p>TikTok: @weirzxx1</p>
         </div>
     </div>
 
@@ -170,34 +184,35 @@
         document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
         document.getElementById('date').innerText = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
     }
-    setInterval(updateTime, 1000); 
-    updateTime();
+    setInterval(updateTime, 1000); updateTime();
 
     function openApp(id) {
         const el = document.getElementById(id);
         el.style.display = 'flex';
         setTimeout(() => el.classList.add('active'), 10);
-        if(id !== 'about-page') document.getElementById('home-screen').classList.add('home-hidden');
+        if(id === 'settings-page' || id === 'phone-page' || id === 'messages-page' || id === 'chrome-page' || id === 'camera-page') {
+            document.getElementById('home-screen').classList.add('home-hidden');
+        }
     }
 
     function closeApp(id) {
-        document.getElementById(id).classList.remove('active');
-        document.getElementById('home-screen').classList.remove('home-hidden');
-        setTimeout(() => { document.getElementById(id).style.display = 'none'; }, 450);
+        const el = document.getElementById(id);
+        el.classList.remove('active');
+        if(id === 'settings-page' || id === 'phone-page' || id === 'messages-page' || id === 'chrome-page' || id === 'camera-page' || id === 'changelogs-page') {
+             document.getElementById('home-screen').classList.remove('home-hidden');
+        }
+        setTimeout(() => { el.style.display = 'none'; }, 450);
     }
 
     function backToSettings(id) {
-        document.getElementById(id).classList.remove('active');
-        setTimeout(() => { document.getElementById(id).style.display = 'none'; }, 450);
+        const el = document.getElementById(id);
+        el.classList.remove('active');
+        setTimeout(() => { el.style.display = 'none'; }, 450);
     }
 
     let touchStartY = 0;
     const homeIndicator = document.getElementById('home-gesture');
-
-    homeIndicator.addEventListener('touchstart', (e) => {
-        touchStartY = e.touches[0].clientY;
-    });
-
+    homeIndicator.addEventListener('touchstart', (e) => { touchStartY = e.touches[0].clientY; });
     homeIndicator.addEventListener('touchend', (e) => {
         const touchEndY = e.changedTouches[0].clientY;
         if (touchStartY - touchEndY > 50) {
