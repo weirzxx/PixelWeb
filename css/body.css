@@ -50,10 +50,10 @@ body, html {
     inset: 0;
     background: #000;
     z-index: 2000;
-    border-radius: 42px; /* Чуть меньше, чем у фрейма */
+    border-radius: 42px;
     display: none;
     transform: translateY(100%);
-    transition: transform 0.45s var(--spring), opacity 0.3s ease;
+    transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
     flex-direction: column;
 }
 
