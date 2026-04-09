@@ -29,8 +29,8 @@
         .boot-loader-container { position: absolute; bottom: 100px; width: 120px; height: 3px; background: #222; border-radius: 10px; overflow: hidden; }
         #boot-bar { width: 0%; height: 100%; background: #fff; transition: width 3s cubic-bezier(0.1, 0, 0.3, 1); }
 
-        #control-center { position: absolute; top: -100%; left: 0; width: 100%; height: 100%; background: var(--panel-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 5000; transition: top 0.4s cubic-bezier(0.1, 0, 0.3, 1); padding: 60px 24px; }
-        #control-center.active { top: 0; }
+        #control-center { position: absolute; top: -100%; left: 0; width: 100%; height: 100%; background: var(--panel-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); z-index: 5000; transition: top 0.4s cubic-bezier(0.1, 0, 0.3, 1); padding: 60px 24px; pointer-events: none; opacity: 0; }
+        #control-center.active { top: 0; pointer-events: auto; opacity: 1; }
         .status-bar-touch { position: absolute; top: 0; left: 0; width: 100%; height: 40px; z-index: 6000; cursor: pointer; }
         
         .qs-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 20px; }
@@ -49,7 +49,7 @@
         .modal-content { flex: 1; overflow-y: auto; padding: 20px; }
         .item { padding: 16px 0; border-bottom: 1px solid #111; cursor: pointer; }
 
-        .home-indicator { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 120px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 10px; z-index: 3000; }
+        .home-indicator { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); width: 120px; height: 5px; background: rgba(255,255,255,0.8); border-radius: 10px; z-index: 7000; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -108,7 +108,7 @@
         <div class="modal-content">
             <div class="item" onclick="openApp('about-page')">
                 <p>About Phone</p>
-                <small>PixelWeb Core 0.9.5</small>
+                <small>0.10.0 Beta</small>
             </div>
         </div>
     </div>
@@ -121,10 +121,10 @@
         <div class="modal-content">
             <div class="item" onclick="openApp('changelogs-page')">
                 <p>Changelogs</p>
-                <small>Build 260409 | weirzxx</small>
+                <small>Build 260409 | @weirzxx1</small>
             </div>
             <p style="color: #888; margin-top: 20px; font-size: 14px;">Developer</p>
-            <p style="font-size: 18px;">weirzxx</p>
+            <p style="font-size: 18px;">@weirzxx1</p>
         </div>
     </div>
 
@@ -134,12 +134,12 @@
             <span>Changelogs</span>
         </div>
         <div class="modal-content">
-            <p style="font-weight: 500; margin-bottom: 10px;">Build 260409 Core:</p>
+            <p style="font-weight: 500; margin-bottom: 10px;">0.10.0 Beta:</p>
             <ul style="list-style: none; color: #888; font-size: 14px; line-height: 1.6;">
-                <li>• Added Control Center (top swipe/click).</li>
-                <li>• New Minimalist Boot Screen.</li>
-                <li>• Static Google Logo integrated.</li>
-                <li>• Functional Dock Icons.</li>
+                <li>• Fixed Control Center activation.</li>
+                <li>• Added functional bottom gesture (close all).</li>
+                <li>• Updated Developer handle to @weirzxx1.</li>
+                <li>• System version bumped to 0.10.0 Beta.</li>
             </ul>
         </div>
     </div>
@@ -149,12 +149,15 @@
     <div id="chrome-page" class="modal"><div class="modal-header"><span onclick="closeApp('chrome-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span><span>Chrome</span></div></div>
     <div id="camera-page" class="modal"><div class="modal-header"><span onclick="closeApp('camera-page')" style="color:var(--blue); cursor:pointer; font-size:24px; margin-right:15px;">←</span><span>Camera</span></div></div>
 
-    <div class="home-indicator"></div>
+    <div class="home-indicator" onclick="closeAllApps()"></div>
 </div>
 
 <script>
     window.addEventListener('load', () => {
-        setTimeout(() => { document.getElementById('boot-bar').style.width = '100%'; }, 100);
+        setTimeout(() => { 
+            const bar = document.getElementById('boot-bar');
+            if(bar) bar.style.width = '100%'; 
+        }, 100);
         setTimeout(() => {
             const boot = document.getElementById('boot-screen');
             if(boot) {
@@ -181,8 +184,20 @@
     function closeApp(id) {
         const el = document.getElementById(id);
         el.classList.remove('active');
-        document.getElementById('home-screen').classList.remove('home-hidden');
+        if (document.querySelectorAll('.modal.active').length <= 1) {
+            document.getElementById('home-screen').classList.remove('home-hidden');
+        }
         setTimeout(() => { el.style.display = 'none'; }, 400);
+    }
+
+    function closeAllApps() {
+        const activeModals = document.querySelectorAll('.modal.active');
+        activeModals.forEach(modal => {
+            modal.classList.remove('active');
+            setTimeout(() => { modal.style.display = 'none'; }, 400);
+        });
+        document.getElementById('home-screen').classList.remove('home-hidden');
+        document.getElementById('control-center').classList.remove('active');
     }
 
     function toggleCC() {
