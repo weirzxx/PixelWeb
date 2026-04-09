@@ -6,6 +6,39 @@
     <title>PixelWeb OS Core</title>
     <link rel="stylesheet" href="css/root.css">
     <link rel="stylesheet" href="css/boot.css">
+    <style>
+        .bottom-bar {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            height: 64px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 32px;
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            z-index: 100;
+        }
+        .dock-icon {
+            width: 42px;
+            height: 42px;
+            background: #333;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .dock-icon:active {
+            transform: scale(0.9);
+        }
+    </style>
 </head>
 <body>
 
@@ -32,11 +65,19 @@
             <h1 id="clock" style="font-size: 64px; font-weight: 300; margin: 0;">00:00</h1>
             <p id="date" style="color: var(--subtext); font-size: 18px; margin: 5px 0 0;">Loading...</p>
         </div>
-        <div class="app-grid" style="display: flex; justify-content: center; margin-top: 50px;">
-            <div class="app" onclick="openApp('settings-page')" style="cursor: pointer; text-align: center;">
-                <div class="icon" style="font-size: 40px; background: #222; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; border-radius: 16px; margin-bottom: 8px;">⚙️</div>
-                <span style="font-size: 12px; color: var(--subtext);">Settings</span>
+
+        <div class="app-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 40px 20px;">
+            <div class="app" onclick="openApp('settings-page')" style="text-align: center;">
+                <div class="icon" style="font-size: 30px; background: #222; width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; border-radius: 14px; margin: 0 auto 8px;">⚙️</div>
+                <span style="font-size: 11px; color: var(--subtext);">Settings</span>
             </div>
+        </div>
+
+        <div class="bottom-bar">
+            <div class="dock-icon" onclick="alert('Phone')">📞</div>
+            <div class="dock-icon" onclick="alert('Messages')">💬</div>
+            <div class="dock-icon" onclick="alert('Chrome')">🌐</div>
+            <div class="dock-icon" onclick="alert('Camera')">📷</div>
         </div>
     </div>
 
